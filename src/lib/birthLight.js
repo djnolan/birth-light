@@ -40,7 +40,7 @@ export function getVisibilityNote(star) {
 export function getRevealText(star, variant) {
   const name = getStarDisplayName(star);
   const date = formatDate(star.birthLightDate);
-  const age = Math.round(star.distLy);
+  const age = star.distLy.toFixed(1);
   return [
     `Look up at ${name} on ${date}. The light you'll see that night left ${age} years ago — the day you were born. You're seeing the star exactly as it was in that moment.`,
     `On ${date}, look up at ${name}. That light has been traveling for ${age} years. What you'll see is a picture of the star from the day you were born.`,
