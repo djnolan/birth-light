@@ -12,6 +12,10 @@ dist
 dist-ssr
 *.local
 
+# Deployment artifacts that can land in root during gh-pages deploy
+/favicon.svg
+/icons.svg
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
