@@ -38,7 +38,40 @@ input {
   font-family: inherit;
 }
 
-/* ── Wordmark ── */
+/* ── Screen transition wrapper ── */
+.screen-wrap {
+  height: 100%;
+}
+
+.anim-fade {
+  animation: animFade 0.3s ease-out;
+}
+
+.anim-zoom {
+  animation: animZoom 0.42s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@keyframes animFade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes animZoom {
+  from { opacity: 0; transform: scale(0.93); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* Overlay-only entry (reveal screen coming from message) */
+.anim-slide-up {
+  animation: animSlideUp 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@keyframes animSlideUp {
+  from { opacity: 0; transform: translateY(48px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Shared wordmark ── */
 .app-wordmark {
   font-family: 'DM Sans', sans-serif;
   font-size: 0.6875rem;
@@ -54,10 +87,23 @@ input {
 .home-screen {
   min-height: 100%;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 3rem 2rem;
+  padding: 2rem 2rem 0;
   text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Stars at the very top */
+.home-stars {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: clamp(80px, 18vh, 140px);
+  pointer-events: none;
 }
 
 .home-content {
@@ -67,6 +113,8 @@ input {
   flex-direction: column;
   align-items: center;
   gap: 1.5rem;
+  position: relative;
+  z-index: 1;
 }
 
 .home-headline {
@@ -96,26 +144,25 @@ input {
 .birthday-input {
   width: 100%;
   padding: 0.8125rem 1rem;
-  border: 1.5px solid rgba(240, 240, 238, 0.3);
+  border: 1.5px solid rgba(240, 240, 238, 0.28);
   border-radius: 0;
-  background: rgba(240, 240, 238, 0.06);
+  background: rgba(240, 240, 238, 0.05);
   font-size: 1rem;
   color: var(--fg);
   -webkit-appearance: none;
   appearance: none;
-  transition: border-color 0.15s, box-shadow 0.15s;
   text-align: center;
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 .birthday-input:focus {
   outline: none;
-  border-color: rgba(240, 240, 238, 0.7);
-  box-shadow: 0 0 0 2px rgba(240, 240, 238, 0.15);
+  border-color: rgba(240, 240, 238, 0.65);
+  box-shadow: 0 0 0 2px rgba(240, 240, 238, 0.12);
 }
 
-/* Style the date input calendar icon on webkit */
 .birthday-input::-webkit-calendar-picker-indicator {
-  filter: invert(1) opacity(0.4);
+  filter: invert(1) opacity(0.35);
   cursor: pointer;
 }
 
@@ -126,7 +173,7 @@ input {
   font-family: 'DM Sans', sans-serif;
   font-size: 0.9375rem;
   font-weight: 500;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.04em;
   border: none;
   cursor: pointer;
   transition: opacity 0.15s;
@@ -148,6 +195,99 @@ input {
   max-width: 30ch;
 }
 
+/* Small figure at bottom */
+.home-figure {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: rgba(240, 240, 238, 0.3);
+  pointer-events: none;
+}
+
+.home-ground {
+  width: 120px;
+  height: 1px;
+  background: rgba(240, 240, 238, 0.1);
+  margin-top: 1px;
+}
+
+/* ─────────────────────────────
+   MESSAGE SCREEN
+───────────────────────────── */
+.message-screen {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+}
+
+.lookup-btn {
+  margin-top: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  opacity: 0.6;
+  transition: opacity 0.15s;
+  padding: 0.5rem 0.75rem;
+  flex-shrink: 0;
+}
+
+.lookup-btn:hover {
+  opacity: 1;
+}
+
+.lookup-arrow {
+  font-size: 1.375rem;
+  line-height: 1;
+  color: var(--fg);
+}
+
+.lookup-label {
+  font-size: 0.6875rem;
+  letter-spacing: 0.13em;
+  text-transform: lowercase;
+  color: var(--mid);
+}
+
+.message-body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem 2.5rem;
+  min-height: 0;
+}
+
+.message-text {
+  text-align: center;
+  font-size: clamp(0.9375rem, 3vw, 1.0625rem);
+  line-height: 1.75;
+  max-width: 32ch;
+  color: var(--fg);
+}
+
+/* Large figure: head + shoulders, cropped at bottom */
+.figure-area {
+  flex-shrink: 0;
+  width: min(300px, 88vw);
+  height: clamp(180px, 40vh, 310px);
+  overflow: hidden;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  color: var(--fg);
+}
+
+.figure-frame {
+  width: 100%;
+}
+
 /* ─────────────────────────────
    REVEAL SCREEN
 ───────────────────────────── */
@@ -157,7 +297,7 @@ input {
   overflow: hidden;
 }
 
-/* Full-screen fixed canvas behind everything */
+/* Full-screen fixed canvas */
 .starmap-canvas {
   position: fixed;
   top: 0;
@@ -189,12 +329,13 @@ input {
 }
 
 .header-btn {
-  font-size: 1.125rem;
-  padding: 0.25rem 0.375rem;
   opacity: 0.5;
   transition: opacity 0.15s;
   min-width: 2rem;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
   color: var(--fg);
 }
 
@@ -202,41 +343,32 @@ input {
   opacity: 1;
 }
 
-/* Star name + date — centered */
-.star-info {
-  padding: 1.25rem 1.5rem 0;
+/* Top: star name + distance */
+.reveal-top {
+  padding: 0.5rem 1.5rem 0;
   text-align: center;
   flex-shrink: 0;
 }
 
-.birth-date {
+.star-name-heading {
   font-family: 'Fraunces', serif;
-  font-size: clamp(1.625rem, 6.5vw, 2.375rem);
+  font-size: clamp(2rem, 8.5vw, 3.25rem);
   font-weight: 700;
-  line-height: 1.05;
-  letter-spacing: -0.025em;
+  line-height: 1;
+  letter-spacing: -0.03em;
   color: var(--fg);
 }
 
-.star-name {
+.star-distance {
   font-family: 'Fraunces', serif;
-  font-size: clamp(1.625rem, 6.5vw, 2.375rem);
-  font-weight: 300;
+  font-size: clamp(0.875rem, 3vw, 1.0625rem);
   font-style: italic;
-  line-height: 1.1;
-  letter-spacing: -0.01em;
-  margin-top: 0.0625rem;
-  color: var(--fg);
-}
-
-.star-dist {
   font-weight: 300;
-  font-style: italic;
   color: var(--mid);
-  font-size: 0.8em;
+  margin-top: 0.3rem;
 }
 
-/* Carousel arrows — flanking the full-screen map */
+/* Carousel arrows span the middle of the starfield */
 .carousel-zone {
   flex: 1;
   display: flex;
@@ -248,7 +380,7 @@ input {
 .carousel-btn {
   font-size: 1.375rem;
   padding: 0.875rem 0.75rem;
-  opacity: 0.4;
+  opacity: 0.38;
   transition: opacity 0.15s;
   color: var(--fg);
   line-height: 1;
@@ -263,38 +395,101 @@ input {
   cursor: default;
 }
 
-/* Bottom content — reveal text + visibility */
-.reveal-footer {
+/* Bottom: date + age + visibility */
+.reveal-bottom {
   flex-shrink: 0;
   padding-bottom: 2rem;
-  /* subtle gradient so text reads against starfield */
-  background: linear-gradient(to top, rgba(13,13,13,0.82) 65%, rgba(13,13,13,0) 100%);
+  text-align: center;
+  background: linear-gradient(to top, rgba(13,13,13,0.88) 68%, rgba(13,13,13,0) 100%);
 }
 
-.reveal-text {
-  padding: 2rem 1.75rem 0.75rem;
-  font-size: 0.9375rem;
-  line-height: 1.7;
+.birth-date {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(1.625rem, 6.5vw, 2.5rem);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
   color: var(--fg);
-  text-align: center;
+  padding: 2rem 1.5rem 0;
+}
+
+.birth-age {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(0.875rem, 3vw, 1.0625rem);
+  font-weight: 300;
+  font-style: italic;
+  color: var(--mid);
+  margin-top: 0.3rem;
 }
 
 .visibility-note {
-  padding: 0 1.75rem;
+  margin-top: 0.875rem;
+  padding: 0 1.5rem;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
   gap: 0.5rem;
   font-size: 0.8125rem;
   color: var(--mid);
   line-height: 1.55;
-  text-align: center;
+  text-align: left;
 }
 
-.vis-bullet {
+/* ─────────────────────────────
+   HEMISPHERE DOTS
+   (shared: reveal + calendar)
+───────────────────────────── */
+.hemi-dot,
+.cal-dot {
+  display: inline-block;
+  border-radius: 50%;
+  border: 1.5px solid var(--fg);
+  position: relative;
+  overflow: hidden;
   flex-shrink: 0;
-  font-size: 1.2em;
-  line-height: 1.25;
+}
+
+.hemi-dot {
+  width: 10px;
+  height: 10px;
+}
+
+.cal-dot {
+  width: 9px;
+  height: 9px;
+}
+
+.cal-key .cal-dot {
+  width: 8px;
+  height: 8px;
+}
+
+.hemi-dot--northern::before,
+.hemi-dot--southern::before,
+.cal-dot--northern::before,
+.cal-dot--southern::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  background: var(--fg);
+}
+
+.hemi-dot--northern::before,
+.cal-dot--northern::before {
+  top: 0;
+  height: 50%;
+}
+
+.hemi-dot--southern::before,
+.cal-dot--southern::before {
+  bottom: 0;
+  height: 50%;
+}
+
+.hemi-dot--both,
+.cal-dot--both {
+  background: var(--fg);
 }
 
 /* ─────────────────────────────
@@ -337,7 +532,7 @@ input {
   line-height: 0.85;
   opacity: 0.4;
   transition: opacity 0.15s;
-  padding: 0.125rem 0.125rem;
+  padding: 0.125rem;
   margin-top: -0.125rem;
   color: var(--fg);
 }
@@ -409,45 +604,4 @@ input {
 
 .cal-dot-btn:hover {
   transform: translateX(-50%) scale(1.4);
-}
-
-/* ── Hemisphere indicators ── */
-/* northern = top half filled, southern = bottom half filled, both = all filled */
-.cal-dot {
-  display: inline-block;
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  border: 1.5px solid var(--fg);
-  position: relative;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-
-.cal-key .cal-dot {
-  width: 8px;
-  height: 8px;
-}
-
-.cal-dot--northern::before,
-.cal-dot--southern::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  background: var(--fg);
-}
-
-.cal-dot--northern::before {
-  top: 0;
-  height: 50%;
-}
-
-.cal-dot--southern::before {
-  bottom: 0;
-  height: 50%;
-}
-
-.cal-dot--both {
-  background: var(--fg);
 }

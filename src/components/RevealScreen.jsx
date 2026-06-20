@@ -1,7 +1,43 @@
 import StarMap from './StarMap';
-import { getStarDisplayName, formatDate, getVisibilityNote, getRevealText } from '../lib/birthLight';
+import { getStarDisplayName, formatDate, getVisibilityNote } from '../lib/birthLight';
 
-export default function RevealScreen({ stars, currentIndex, onIndexChange, onBack, onCalendar }) {
+function PersonDownIcon() {
+  return (
+    <svg viewBox="0 0 20 27" width="15" height="20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <circle cx="10" cy="5" r="3.8" />
+      <path d="M10 9 L10 17" />
+      <path d="M10 12 L5 16 M10 12 L15 16" />
+      <path d="M10 17 L6.5 22.5 M10 17 L13.5 22.5" />
+      <path d="M10 25 L10 27 M7.5 25 L10 27 L12.5 25" />
+    </svg>
+  );
+}
+
+function CalendarIcon() {
+  return (
+    <svg viewBox="0 0 20 20" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden="true">
+      <rect x="2" y="4" width="16" height="14" rx="1.5" />
+      <path d="M2 8 L18 8" />
+      <path d="M7 2 L7 6 M13 2 L13 6" />
+      <path d="M6 12 L8 12 M10 12 L12 12 M14 12 L16 12" />
+    </svg>
+  );
+}
+
+function HemiDot({ hemisphere }) {
+  return (
+    <span
+      className={`hemi-dot hemi-dot--${hemisphere}`}
+      aria-label={
+        hemisphere === 'northern' ? 'Northern hemisphere'
+        : hemisphere === 'southern' ? 'Southern hemisphere'
+        : 'Both hemispheres'
+      }
+    />
+  );
+}
+
+export default function RevealScreen({ stars, currentIndex, onIndexChange, onBack, onCalendar, overlayAnim }) {
   const star = stars[currentIndex];
   const canGoPrev = currentIndex > 0;
   const canGoNext = currentIndex < stars.length - 1;
@@ -10,19 +46,20 @@ export default function RevealScreen({ stars, currentIndex, onIndexChange, onBac
     <div className="reveal-screen">
       <StarMap centerStar={star} />
 
-      <div className="reveal-overlay">
+      <div className={`reveal-overlay${overlayAnim ? ` ${overlayAnim}` : ''}`}>
         <div className="reveal-header">
-          <button onClick={onBack} className="header-btn" aria-label="Back to home">←</button>
+          <button onClick={onBack} className="header-btn" aria-label="Back to home">
+            <PersonDownIcon />
+          </button>
           <span className="app-wordmark">birth light</span>
-          <button onClick={onCalendar} className="header-btn" aria-label="Open calendar">⊟</button>
+          <button onClick={onCalendar} className="header-btn" aria-label="Open calendar">
+            <CalendarIcon />
+          </button>
         </div>
 
-        <div className="star-info">
-          <h1 className="birth-date">{formatDate(star.birthLightDate)}</h1>
-          <h2 className="star-name">
-            {getStarDisplayName(star)}
-            <span className="star-dist"> {star.distLy.toFixed(1)}</span>
-          </h2>
+        <div className="reveal-top">
+          <h1 className="star-name-heading">{getStarDisplayName(star)}</h1>
+          <p className="star-distance">{star.distLy.toFixed(1)} light years</p>
         </div>
 
         <div className="carousel-zone">
@@ -40,10 +77,11 @@ export default function RevealScreen({ stars, currentIndex, onIndexChange, onBac
           >→</button>
         </div>
 
-        <div className="reveal-footer">
-          <p className="reveal-text">{getRevealText(star, star.revealVariant)}</p>
+        <div className="reveal-bottom">
+          <h2 className="birth-date">{formatDate(star.birthLightDate)}</h2>
+          <p className="birth-age">You will be {star.distLy.toFixed(1)} years old</p>
           <div className="visibility-note">
-            <span className="vis-bullet" aria-hidden="true">·</span>
+            <HemiDot hemisphere={star.hemisphere} />
             <span>{getVisibilityNote(star)}</span>
           </div>
         </div>
