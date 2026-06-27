@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import StopMotionFigure from './StopMotionFigure';
 
 const STAR_POS = [
   { x: 8,  y: 11, r: 1.1 }, { x: 22, y: 5,  r: 0.8 }, { x: 37, y: 15, r: 1.0 },
@@ -18,19 +19,6 @@ function HomeStars() {
           fill={`rgba(240,240,238,${0.12 + (i % 4) * 0.06})`}
         />
       ))}
-    </svg>
-  );
-}
-
-function FigureSmall() {
-  return (
-    <svg viewBox="0 0 40 88" width="36" height="80" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
-      <ellipse cx="20" cy="11" rx="7.5" ry="8.5" />
-      <path d="M20 20 L20 50" />
-      <path d="M20 32 L8 44" />
-      <path d="M20 32 L32 44" />
-      <path d="M20 50 L12 78" />
-      <path d="M20 50 L28 78" />
     </svg>
   );
 }
@@ -76,8 +64,7 @@ export default function HomeScreen({ onSubmit }) {
       </div>
 
       <div className="home-figure" aria-hidden="true">
-        <FigureSmall />
-        <div className="home-ground" />
+        <StopMotionFigure />
       </div>
     </div>
   );

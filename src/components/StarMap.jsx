@@ -5,6 +5,17 @@ const DEG = Math.PI / 180;
 const FOV_RADIUS_DEG = 25;
 const FOV_RADIUS_RAD = FOV_RADIUS_DEG * DEG;
 
+// Cut-paper star shape path from star-shapes.svg
+const STAR_PATH = new Path2D(
+  'M719.349,186.544C714.037,184.331 708.504,181.011 702.749,176.584C696.995,172.158 692.457,167.731 689.137,163.304C692.015,157.107 695.667,151.297 700.093,145.874C704.52,140.452 708.947,136.191 713.373,133.092C719.128,135.527 724.661,139.124 729.973,143.882C735.285,148.641 739.491,153.234 742.589,157.66C740.376,162.972 737.111,168.34 732.795,173.762C728.479,179.185 723.997,183.446 719.349,186.544Z'
+);
+const STAR_CX = 715.863;
+const STAR_CY = 159.818;
+const STAR_HALF_EXTENT = 26.73;
+const ROTATIONS = [0, -1.634, 1.634, -3.011];
+
+const ROTATION_MAP = new Map(starsData.map((s, i) => [s.id, i % 4]));
+
 function project(ra, dec, ra0, dec0) {
   let dRaHours = ra - ra0;
   if (dRaHours > 12) dRaHours -= 24;
@@ -28,13 +39,15 @@ function magToSize(mag) {
   return Math.max(0.6, 3.2 - (mag + 1.5) * (2.6 / 8));
 }
 
-function drawDiamond(ctx, x, y, rw, rh) {
-  ctx.beginPath();
-  ctx.moveTo(x, y - rh);
-  ctx.lineTo(x + rw, y);
-  ctx.lineTo(x, y + rh);
-  ctx.lineTo(x - rw, y);
-  ctx.closePath();
+function drawStarShape(ctx, px, py, r, rotIdx) {
+  const s = r / STAR_HALF_EXTENT;
+  ctx.save();
+  ctx.translate(px, py);
+  ctx.rotate(ROTATIONS[rotIdx]);
+  ctx.scale(s, s);
+  ctx.translate(-STAR_CX, -STAR_CY);
+  ctx.fill(STAR_PATH);
+  ctx.restore();
 }
 
 export default function StarMap({ centerStar }) {
@@ -75,13 +88,13 @@ export default function StarMap({ centerStar }) {
         const py = cy - y * scale;
         const r = magToSize(star.mag);
         const fade = 1 - (angDist / FOV_RADIUS_RAD) * 0.65;
+        const rotIdx = ROTATION_MAP.get(star.id) ?? 0;
 
-        drawDiamond(ctx, px, py, r, r * 1.6);
         ctx.fillStyle = `rgba(255,255,255,${(fade * 0.9).toFixed(2)})`;
-        ctx.fill();
+        drawStarShape(ctx, px, py, r, rotIdx);
       }
 
-      // Center star: subtle glow only, no rays
+      // Center star: radial glow + cut-paper shape
       const cr = Math.max(2.5, magToSize(centerStar.mag) * 1.8);
 
       const grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, cr * 14);
@@ -94,9 +107,9 @@ export default function StarMap({ centerStar }) {
       ctx.fillStyle = grd;
       ctx.fill();
 
-      drawDiamond(ctx, cx, cy, cr, cr * 1.6);
+      const rotIdx = ROTATION_MAP.get(centerStar.id) ?? 0;
       ctx.fillStyle = '#ffffff';
-      ctx.fill();
+      drawStarShape(ctx, cx, cy, cr, rotIdx);
     }
 
     draw();
