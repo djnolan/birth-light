@@ -1,5 +1,4 @@
 import { getRevealText } from '../lib/birthLight';
-import StopMotionFigure from './StopMotionFigure';
 
 export default function MessageScreen({ star, onLookUp }) {
   const text = getRevealText(star, star.revealVariant);
@@ -15,9 +14,8 @@ export default function MessageScreen({ star, onLookUp }) {
         <p className="message-text">{text}</p>
       </div>
 
-      <div className="figure-area" aria-hidden="true">
-        <StopMotionFigure />
-      </div>
+      {/* Reserves space for the fixed figure-layer below */}
+      <div className="figure-spacer" />
     </div>
   );
 }

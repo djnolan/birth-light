@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Eczar:wght@400;500&family=Space+Mono:ital,wght@0,400;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Eczar:wght@400;500&display=swap');
 
 *, *::before, *::after {
   box-sizing: border-box;
@@ -20,7 +20,8 @@ html, body, #root {
 body {
   background: var(--bg);
   color: var(--fg);
-  font-family: 'Space Mono', monospace;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 400;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -38,47 +39,79 @@ input {
   font-family: inherit;
 }
 
-/* ── Screen transition wrapper ── */
-.screen-wrap {
+/* ── App root ── */
+.app {
   height: 100%;
+  position: relative;
 }
 
-.anim-fade {
-  animation: animFade 0.3s ease-out;
+/* ── Screen content wrapper ── */
+.screen-content {
+  height: 100%;
+  transition: opacity 0.25s ease;
 }
 
-.anim-zoom {
-  animation: animZoom 0.42s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+.screen-content.content-out {
+  opacity: 0;
+  pointer-events: none;
 }
 
-@keyframes animFade {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+/* ── Persistent figure layer (fixed, always rendered) ── */
+.figure-layer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 5;
+  pointer-events: none;
+  overflow: hidden;
 }
 
-@keyframes animZoom {
-  from { opacity: 0; transform: scale(0.93); }
-  to   { opacity: 1; transform: scale(1); }
+.figure-layer .stop-motion {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
-/* Overlay-only entry (reveal screen coming from message) */
-.anim-slide-up {
-  animation: animSlideUp 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+/* Transitions only active after first render (prevents initial-paint jump) */
+.figure-layer--animated {
+  transition: height 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-@keyframes animSlideUp {
-  from { opacity: 0; transform: translateY(48px); }
-  to   { opacity: 1; transform: translateY(0); }
+.figure-layer--animated .stop-motion {
+  transition: object-position 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ── Shared wordmark ── */
-.app-wordmark {
-  font-family: 'Space Mono', sans-serif;
-  font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.14em;
-  text-transform: lowercase;
-  color: var(--mid);
+/* Home: full landscape view of standing figure */
+.figure-layer--home {
+  height: min(56.25vw, 300px);
+  transform: translateY(0);
+}
+
+.figure-layer--home .stop-motion {
+  object-position: center bottom;
+}
+
+/* Message: tall zoomed crop to head and shoulders */
+.figure-layer--message {
+  height: clamp(260px, 60vh, 480px);
+  transform: translateY(0);
+}
+
+.figure-layer--message .stop-motion {
+  object-position: center 10%;
+}
+
+/* Offscreen: slid below viewport (during reveal/calendar) */
+.figure-layer--offscreen {
+  height: clamp(260px, 60vh, 480px);
+  transform: translateY(110%);
+}
+
+.figure-layer--offscreen .stop-motion {
+  object-position: center 10%;
 }
 
 /* ─────────────────────────────
@@ -91,18 +124,19 @@ input {
   align-items: center;
   justify-content: center;
   padding: 2rem 2rem 0;
+  /* Leave space at bottom for fixed figure */
+  padding-bottom: calc(min(56.25vw, 300px) + 1.5rem);
   text-align: center;
   position: relative;
   overflow: hidden;
 }
 
-/* Stars at the very top */
 .home-stars {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
-  height: clamp(80px, 18vh, 140px);
+  height: clamp(60px, 16vh, 100px);
   pointer-events: none;
 }
 
@@ -170,7 +204,7 @@ input {
   padding: 0.875rem 1.5rem;
   background: var(--fg);
   color: var(--bg);
-  font-family: 'Space Mono', sans-serif;
+  font-family: 'DM Sans', sans-serif;
   font-size: 0.9375rem;
   font-weight: 500;
   letter-spacing: 0.04em;
@@ -189,25 +223,11 @@ input {
 }
 
 .privacy-note {
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 300;
   color: var(--mid);
   line-height: 1.55;
   max-width: 30ch;
-}
-
-/* Stop-motion figure at bottom */
-.home-figure {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  pointer-events: none;
-}
-
-.home-figure .stop-motion {
-  width: 100%;
-  height: auto;
-  display: block;
 }
 
 /* ─────────────────────────────
@@ -267,20 +287,10 @@ input {
   color: var(--fg);
 }
 
-/* Large figure: head + shoulders, cropped at bottom */
-.figure-area {
+/* Spacer that reserves height for the fixed figure-layer below */
+.figure-spacer {
   flex-shrink: 0;
-  width: 100%;
-  height: clamp(200px, 48vh, 380px);
-  overflow: hidden;
-}
-
-.figure-area .stop-motion {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center 20%;
-  display: block;
+  height: clamp(260px, 60vh, 480px);
 }
 
 /* ─────────────────────────────
@@ -301,6 +311,15 @@ input {
   height: 100vh;
   display: block;
   z-index: 0;
+}
+
+@keyframes starmapEnter {
+  from { opacity: 0; transform: translateY(-24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.starmap-canvas--entering {
+  animation: starmapEnter 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
 }
 
 /* All content overlays the canvas */
@@ -338,7 +357,6 @@ input {
   opacity: 1;
 }
 
-/* Top: star name + distance */
 .reveal-top {
   padding: 0.5rem 1.5rem 0;
   text-align: center;
@@ -363,7 +381,6 @@ input {
   margin-top: 0.3rem;
 }
 
-/* Carousel arrows span the middle of the starfield */
 .carousel-zone {
   flex: 1;
   display: flex;
@@ -390,7 +407,6 @@ input {
   cursor: default;
 }
 
-/* Bottom: date + age + visibility */
 .reveal-bottom {
   flex-shrink: 0;
   padding-bottom: 2rem;

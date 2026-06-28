@@ -1,84 +1,131 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { getUpcomingStars } from './lib/birthLight';
 import HomeScreen from './components/HomeScreen';
 import MessageScreen from './components/MessageScreen';
 import RevealScreen from './components/RevealScreen';
 import CalendarScreen from './components/CalendarScreen';
+import StarMap from './components/StarMap';
+import StopMotionFigure from './components/StopMotionFigure';
+
+const SWAP_DELAY = 300; // ms — wait for content fade before swapping screen
 
 export default function App() {
-  const [nav, setNav] = useState({ screen: 'home', seq: 0, wrapAnim: 'anim-fade', overlayAnim: '' });
-  const [upcomingStars, setUpcomingStars] = useState([]);
-  const [starIndex, setStarIndex] = useState(0);
-
-  useEffect(() => {
+  const [stars, setStars] = useState(() => {
     const saved = localStorage.getItem('birthlight_birthday');
-    if (saved) {
-      const stars = getUpcomingStars(saved);
-      if (stars.length > 0) {
-        setUpcomingStars(stars);
-        setNav({ screen: 'reveal', seq: 1, wrapAnim: 'anim-fade', overlayAnim: '' });
-      }
-    }
-  }, []);
+    return saved ? getUpcomingStars(saved) : [];
+  });
+  const [starIdx, setStarIdx] = useState(0);
 
-  function go(screen, wrapAnim = 'anim-fade', overlayAnim = '') {
-    setNav(prev => ({ screen, seq: prev.seq + 1, wrapAnim, overlayAnim }));
+  const [screen, setScreen] = useState(() =>
+    localStorage.getItem('birthlight_birthday') ? 'reveal' : 'home'
+  );
+
+  // 'home' | 'message' | 'offscreen'
+  const [figureState, setFigureState] = useState(() =>
+    localStorage.getItem('birthlight_birthday') ? 'offscreen' : 'home'
+  );
+
+  const [showStarMap, setShowStarMap] = useState(() =>
+    !!localStorage.getItem('birthlight_birthday')
+  );
+  const [starMapEntering, setStarMapEntering] = useState(false);
+  const [contentOut, setContentOut] = useState(false);
+
+  // Prevent transition animation on first paint
+  const [animated, setAnimated] = useState(false);
+  useEffect(() => { requestAnimationFrame(() => setAnimated(true)); }, []);
+
+  const timerRef = useRef(null);
+  function clearT() { if (timerRef.current) clearTimeout(timerRef.current); }
+
+  // Fade out content → swap screen → fade in new content
+  function transition(nextScreen, onSwap) {
+    setContentOut(true);
+    clearT();
+    timerRef.current = setTimeout(() => {
+      setScreen(nextScreen);
+      onSwap?.();
+      setTimeout(() => setContentOut(false), 30);
+    }, SWAP_DELAY);
   }
 
-  function handleBirthdaySubmit(birthday) {
-    const stars = getUpcomingStars(birthday);
-    setUpcomingStars(stars);
-    setStarIndex(0);
-    localStorage.setItem('birthlight_birthday', birthday);
-    go('message', 'anim-zoom');
+  function handleBirthday(bd) {
+    localStorage.setItem('birthlight_birthday', bd);
+    const upcoming = getUpcomingStars(bd);
+    setStars(upcoming);
+    setStarIdx(0);
+    setFigureState('message'); // begin zoom immediately
+    transition('message');
   }
 
   function handleLookUp() {
-    go('reveal', 'anim-fade', 'anim-slide-up');
+    setFigureState('offscreen'); // begin slide-down immediately
+    transition('reveal', () => {
+      setShowStarMap(true);
+      setStarMapEntering(true);
+      setTimeout(() => setStarMapEntering(false), 800);
+    });
   }
 
   function handleBack() {
     localStorage.removeItem('birthlight_birthday');
-    setUpcomingStars([]);
-    setStarIndex(0);
-    go('home', 'anim-fade');
+    setFigureState('home'); // begin slide-up immediately
+    transition('home', () => {
+      setShowStarMap(false);
+      setStars([]);
+    });
   }
 
-  function handleStarSelect(index) {
-    setStarIndex(index);
-    setNav(prev => ({ screen: 'reveal', seq: prev.seq + 1, wrapAnim: 'anim-fade', overlayAnim: '' }));
+  function handleStarSelect(idx) {
+    setStarIdx(idx);
+    setScreen('reveal');
   }
 
-  const { screen, seq, wrapAnim, overlayAnim } = nav;
+  const star = stars[starIdx];
+
+  const figureClass = [
+    'figure-layer',
+    `figure-layer--${figureState}`,
+    animated ? 'figure-layer--animated' : '',
+  ].join(' ');
 
   return (
-    <div key={seq} className={`screen-wrap ${wrapAnim}`}>
-      {screen === 'home' && (
-        <HomeScreen onSubmit={handleBirthdaySubmit} />
-      )}
-      {screen === 'message' && upcomingStars.length > 0 && (
-        <MessageScreen
-          star={upcomingStars[0]}
-          onLookUp={handleLookUp}
+    <div className="app">
+      {showStarMap && star && (
+        <StarMap
+          centerStar={star}
+          extraClass={starMapEntering ? 'starmap-canvas--entering' : ''}
         />
       )}
-      {screen === 'reveal' && upcomingStars.length > 0 && (
-        <RevealScreen
-          stars={upcomingStars}
-          currentIndex={starIndex}
-          onIndexChange={setStarIndex}
-          onBack={handleBack}
-          onCalendar={() => go('calendar', 'anim-slide-up')}
-          overlayAnim={overlayAnim}
-        />
-      )}
-      {screen === 'calendar' && (
-        <CalendarScreen
-          stars={upcomingStars}
-          onClose={() => go('reveal', 'anim-fade')}
-          onStarSelect={handleStarSelect}
-        />
-      )}
+
+      <div className={figureClass} aria-hidden="true">
+        <StopMotionFigure />
+      </div>
+
+      <div className={`screen-content${contentOut ? ' content-out' : ''}`}>
+        {screen === 'home' && (
+          <HomeScreen onSubmit={handleBirthday} />
+        )}
+        {screen === 'message' && star && (
+          <MessageScreen star={star} onLookUp={handleLookUp} />
+        )}
+        {screen === 'reveal' && star && (
+          <RevealScreen
+            stars={stars}
+            currentIndex={starIdx}
+            onIndexChange={setStarIdx}
+            onBack={handleBack}
+            onCalendar={() => setScreen('calendar')}
+          />
+        )}
+        {screen === 'calendar' && (
+          <CalendarScreen
+            stars={stars}
+            onClose={() => setScreen('reveal')}
+            onStarSelect={handleStarSelect}
+          />
+        )}
+      </div>
     </div>
   );
 }

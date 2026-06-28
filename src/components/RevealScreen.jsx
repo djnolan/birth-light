@@ -1,4 +1,3 @@
-import StarMap from './StarMap';
 import { getStarDisplayName, formatDate, getVisibilityNote } from '../lib/birthLight';
 
 function PersonDownIcon() {
@@ -37,21 +36,19 @@ function HemiDot({ hemisphere }) {
   );
 }
 
-export default function RevealScreen({ stars, currentIndex, onIndexChange, onBack, onCalendar, overlayAnim }) {
+export default function RevealScreen({ stars, currentIndex, onIndexChange, onBack, onCalendar }) {
   const star = stars[currentIndex];
   const canGoPrev = currentIndex > 0;
   const canGoNext = currentIndex < stars.length - 1;
 
   return (
     <div className="reveal-screen">
-      <StarMap centerStar={star} />
-
-      <div className={`reveal-overlay${overlayAnim ? ` ${overlayAnim}` : ''}`}>
+      <div className="reveal-overlay">
         <div className="reveal-header">
           <button onClick={onBack} className="header-btn" aria-label="Back to home">
             <PersonDownIcon />
           </button>
-          <span className="app-wordmark">birth light</span>
+          <div />
           <button onClick={onCalendar} className="header-btn" aria-label="Open calendar">
             <CalendarIcon />
           </button>
