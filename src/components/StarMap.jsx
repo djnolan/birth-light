@@ -12,6 +12,8 @@ const STAR_CX = 715.863;
 const STAR_CY = 159.818;
 const STAR_HALF = 26.73;
 const ROTATIONS = [0, -1.634, 1.634, -3.011]; // radians
+// Size multipliers per frame — makes rotation frames visually distinct at small sizes
+const FRAME_SIZE = [1.0, 0.76, 1.18, 0.88];
 
 // Per-star base rotation index (0-3)
 const BASE_ROT = new Map(starsData.map((s, i) => [s.id, i % 4]));
@@ -98,9 +100,10 @@ export default function StarMap({ centerStar, extraClass = '' }) {
         const base = BASE_ROT.get(star.id) ?? 0;
         const phase = PHASE_OFF.get(star.id) ?? 0;
         const rotIdx = (base + phase + rotFrame) % 4;
+        const sr = r * FRAME_SIZE[rotIdx];
 
         ctx.fillStyle = `rgba(255,255,255,${(fade * 0.9).toFixed(2)})`;
-        drawShape(ctx, px, py, r, rotIdx);
+        drawShape(ctx, px, py, sr, rotIdx);
       }
 
       // Center star: radial glow + cut-paper shape

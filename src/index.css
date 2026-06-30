@@ -79,8 +79,7 @@ input {
 /* Transitions only active after first render (prevents initial-paint jump) */
 .figure-layer--animated {
   transition: height 0.6s cubic-bezier(0.4, 0, 0.2, 1),
-              transform 0.6s cubic-bezier(0.4, 0, 0.2, 1),
-              bottom 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+              transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .figure-layer--animated .stop-motion {
@@ -97,11 +96,11 @@ input {
   object-position: center bottom;
 }
 
-/* Message: 250% size, offset -60vh so head fills the frame */
+/* Message: 250% size, shifted down so shoulders sit at screen bottom */
 .figure-layer--message {
   height: clamp(650px, 150vh, 1200px);
-  bottom: -60vh;
-  transform: translateY(0);
+  bottom: 0;
+  transform: translateY(70%);
 }
 
 .figure-layer--message .stop-motion {
@@ -111,7 +110,7 @@ input {
 /* Offscreen: slid below viewport (during reveal/calendar) */
 .figure-layer--offscreen {
   height: clamp(650px, 150vh, 1200px);
-  bottom: -60vh;
+  bottom: 0;
   transform: translateY(110%);
 }
 
