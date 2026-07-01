@@ -78,7 +78,9 @@ export default function StarMap({ centerStar, extraClass = '' }) {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
       const cx = w / 2, cy = h / 2;
-      const scale = (Math.min(w, h) / 2) / Math.sin(FOV_RADIUS_RAD);
+      // Scale so the FOV circle reaches the screen corners, filling the full viewport
+      const halfDiag = Math.sqrt(w * w + h * h) / 2;
+      const scale = halfDiag / Math.sin(FOV_RADIUS_RAD);
 
       ctx.fillStyle = '#0a0a0a';
       ctx.fillRect(0, 0, w, h);
