@@ -64,8 +64,8 @@ export default function StarMap({ centerStar, extraClass = '' }) {
 
     function draw(rotFrame) {
       const dpr = window.devicePixelRatio || 1;
-      const w = window.innerWidth;
-      const h = window.innerHeight;
+      const w = canvas.offsetWidth;
+      const h = canvas.offsetHeight;
 
       if (w !== currentW || h !== currentH) {
         canvas.width = w * dpr;

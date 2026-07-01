@@ -38,7 +38,7 @@ function HomeStars() {
         const rotIdx = (phase + frame) % 4;
         const deg = STAR_ROT_DEG[rotIdx];
         const s = (r * STAR_NORM * FRAME_SIZE[rotIdx]).toFixed(5);
-        const opacity = (0.07 + (i % 4) * 0.05).toFixed(3);
+        const opacity = (0.30 + (i % 4) * 0.15).toFixed(3);
         return (
           <path
             key={i}
