@@ -5,7 +5,7 @@ const FRAMES = Object.entries(frameModules)
   .sort(([a], [b]) => a.localeCompare(b))
   .map(([, m]) => m.default);
 
-export default function StopMotionFigure({ fps = 6, className = '' }) {
+export default function StopMotionFigure({ fps = 3, className = '' }) {
   const [i, setI] = useState(0);
 
   useEffect(() => {

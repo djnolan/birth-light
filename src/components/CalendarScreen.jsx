@@ -1,3 +1,4 @@
+import { X } from 'lucide-react';
 import { groupStarsByYear, getStarDisplayName, formatDate } from '../lib/birthLight';
 
 function HemiDot({ hemisphere }) {
@@ -37,7 +38,7 @@ export default function CalendarScreen({ stars, onClose, onStarSelect }) {
           <p className="cal-subtitle">When your birth light will arrive</p>
         </div>
         <button onClick={onClose} className="close-btn" aria-label="Close calendar">
-          ×
+          <X size={22} />
         </button>
       </div>
 

@@ -1,3 +1,4 @@
+import { ArrowUp } from 'lucide-react';
 import { getRevealText } from '../lib/birthLight';
 
 export default function MessageScreen({ star, onLookUp }) {
@@ -6,7 +7,7 @@ export default function MessageScreen({ star, onLookUp }) {
   return (
     <div className="message-screen">
       <button className="lookup-btn" onClick={onLookUp} aria-label="Look up at the stars">
-        <span className="lookup-arrow">↑</span>
+        <ArrowUp size={22} className="lookup-arrow" />
         <span className="lookup-label">look up</span>
       </button>
 

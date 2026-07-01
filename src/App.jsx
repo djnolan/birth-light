@@ -7,7 +7,7 @@ import CalendarScreen from './components/CalendarScreen';
 import StarMap from './components/StarMap';
 import StopMotionFigure from './components/StopMotionFigure';
 
-const SWAP_DELAY = 300; // ms — wait for content fade before swapping screen
+const SWAP_DELAY = 600; // ms — wait for content fade before swapping screen
 
 export default function App() {
   const [stars, setStars] = useState(() => {

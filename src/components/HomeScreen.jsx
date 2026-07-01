@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const STAR_PATH_D = 'M719.349,186.544C714.037,184.331 708.504,181.011 702.749,176.584C696.995,172.158 692.457,167.731 689.137,163.304C692.015,157.107 695.667,151.297 700.093,145.874C704.52,140.452 708.947,136.191 713.373,133.092C719.128,135.527 724.661,139.124 729.973,143.882C735.285,148.641 739.491,153.234 742.589,157.66C740.376,162.972 737.111,168.34 732.795,173.762C728.479,179.185 723.997,183.446 719.349,186.544Z';
 const STAR_ROT_DEG = [0, -93.6, 93.6, -172.5];
+const FRAME_SIZE = [1.0, 0.76, 1.18, 0.88];
 const STAR_CX = 715.863;
 const STAR_CY = 159.818;
-const STAR_NORM = 1 / 26.73; // scale factor to make path radius = 1 unit
+const STAR_NORM = 1 / 26.73;
 
 const STAR_POS = [
   { x: 8,  y: 4.5, r: 0.50 }, { x: 22, y: 1.8, r: 0.38 },
@@ -18,6 +19,13 @@ const STAR_POS = [
 ];
 
 function HomeStars() {
+  const [frame, setFrame] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => setFrame(f => (f + 1) % 4), 300);
+    return () => clearInterval(id);
+  }, []);
+
   return (
     <svg
       className="home-stars"
@@ -26,15 +34,17 @@ function HomeStars() {
       aria-hidden="true"
     >
       {STAR_POS.map(({ x, y, r }, i) => {
-        const s = r * STAR_NORM;
-        const deg = STAR_ROT_DEG[i % 4];
-        const opacity = 0.07 + (i % 4) * 0.05;
+        const phase = i % 4;
+        const rotIdx = (phase + frame) % 4;
+        const deg = STAR_ROT_DEG[rotIdx];
+        const s = (r * STAR_NORM * FRAME_SIZE[rotIdx]).toFixed(5);
+        const opacity = (0.07 + (i % 4) * 0.05).toFixed(3);
         return (
           <path
             key={i}
             d={STAR_PATH_D}
-            transform={`translate(${x},${y}) rotate(${deg}) scale(${s.toFixed(5)}) translate(${-STAR_CX},${-STAR_CY})`}
-            fill={`rgba(240,240,238,${opacity.toFixed(3)})`}
+            transform={`translate(${x},${y}) rotate(${deg}) scale(${s}) translate(${-STAR_CX},${-STAR_CY})`}
+            fill={`rgba(255,255,255,${opacity})`}
           />
         );
       })}
@@ -63,21 +73,22 @@ export default function HomeScreen({ onSubmit }) {
           Enter your birthday to find starlight as old as you are
         </p>
         <form onSubmit={handleSubmit} className="home-form">
+          <label className="date-label" htmlFor="birthday">Your birthday</label>
           <input
+            id="birthday"
             type="date"
             value={value}
             onChange={e => setValue(e.target.value)}
             className="birthday-input"
             max={new Date().toISOString().split('T')[0]}
-            required
             aria-label="Your birthday"
           />
-          <button type="submit" className="submit-btn" disabled={!value}>
+          <button type="submit" className="submit-btn">
             Begin ◇
           </button>
         </form>
         <p className="privacy-note">
-          Your information is saved to your device only and not shared anywhere else.
+          Saved to your device only.
         </p>
       </div>
     </div>

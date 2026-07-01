@@ -50,7 +50,8 @@ input {
   height: 100%;
   position: relative;
   z-index: 2;
-  transition: opacity 0.25s ease;
+  overflow: hidden;
+  transition: opacity 0.5s ease;
 }
 
 .screen-content.content-out {
@@ -78,12 +79,12 @@ input {
 
 /* Transitions only active after first render (prevents initial-paint jump) */
 .figure-layer--animated {
-  transition: height 0.6s cubic-bezier(0.4, 0, 0.2, 1),
-              transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: height 1.2s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .figure-layer--animated .stop-motion {
-  transition: object-position 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: object-position 1.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Home: full landscape view of standing figure */
@@ -96,11 +97,11 @@ input {
   object-position: center bottom;
 }
 
-/* Message: 250% size, shifted down so shoulders sit at screen bottom */
+/* Message: zoomed in, shifted down so shoulders sit at screen bottom */
 .figure-layer--message {
-  height: clamp(650px, 150vh, 1200px);
+  height: clamp(550px, 130vh, 1000px);
   bottom: 0;
-  transform: translateY(70%);
+  transform: translateY(65%);
 }
 
 .figure-layer--message .stop-motion {
@@ -109,7 +110,7 @@ input {
 
 /* Offscreen: slid below viewport (during reveal/calendar) */
 .figure-layer--offscreen {
-  height: clamp(650px, 150vh, 1200px);
+  height: clamp(550px, 130vh, 1000px);
   bottom: 0;
   transform: translateY(110%);
 }
@@ -158,7 +159,7 @@ input {
 .home-headline {
   font-family: 'Eczar', serif;
   font-size: clamp(3rem, 12vw, 4.75rem);
-  font-weight: 500;
+  font-weight: 400;
   line-height: 0.95;
   letter-spacing: -0.03em;
   color: var(--fg);
@@ -175,13 +176,23 @@ input {
 .home-form {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 0.625rem;
   width: 100%;
 }
 
+.date-label {
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mid);
+  font-weight: 400;
+}
+
 .birthday-input {
-  width: 100%;
-  padding: 0.8125rem 1rem;
+  width: min(220px, 100%);
+  height: 48px;
+  padding: 0 1rem;
   border: 1.5px solid rgba(240, 240, 238, 0.28);
   border-radius: 0;
   background: rgba(240, 240, 238, 0.05);
@@ -205,7 +216,7 @@ input {
 }
 
 .submit-btn {
-  padding: 0.875rem 1.5rem;
+  padding: 0.875rem 2rem;
   background: var(--fg);
   color: var(--bg);
   font-family: 'DM Sans', sans-serif;
@@ -217,12 +228,7 @@ input {
   transition: opacity 0.15s;
 }
 
-.submit-btn:disabled {
-  opacity: 0.25;
-  cursor: default;
-}
-
-.submit-btn:not(:disabled):hover {
+.submit-btn:hover {
   opacity: 0.85;
 }
 
@@ -238,7 +244,7 @@ input {
    MESSAGE SCREEN
 ───────────────────────────── */
 .message-screen {
-  height: 100vh;
+  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -262,8 +268,6 @@ input {
 }
 
 .lookup-arrow {
-  font-size: 1.375rem;
-  line-height: 1;
   color: var(--fg);
 }
 
@@ -302,7 +306,7 @@ input {
 ───────────────────────────── */
 .reveal-screen {
   position: relative;
-  height: 100vh;
+  height: 100%;
   overflow: hidden;
 }
 
@@ -311,8 +315,8 @@ input {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   display: block;
   z-index: 0;
 }
@@ -323,14 +327,14 @@ input {
 }
 
 .starmap-canvas--entering {
-  animation: starmapEnter 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  animation: starmapEnter 1.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
 }
 
 /* All content overlays the canvas */
 .reveal-overlay {
   position: relative;
   z-index: 1;
-  height: 100vh;
+  height: 100%;
   display: flex;
   flex-direction: column;
   max-width: 480px;
@@ -370,7 +374,7 @@ input {
 .star-name-heading {
   font-family: 'Eczar', serif;
   font-size: clamp(2rem, 8.5vw, 3.25rem);
-  font-weight: 500;
+  font-weight: 400;
   line-height: 1;
   letter-spacing: -0.03em;
   color: var(--fg);
@@ -421,7 +425,7 @@ input {
 .birth-date {
   font-family: 'Eczar', serif;
   font-size: clamp(1.625rem, 6.5vw, 2.5rem);
-  font-weight: 500;
+  font-weight: 400;
   line-height: 1.05;
   letter-spacing: -0.025em;
   color: var(--fg);
@@ -440,14 +444,10 @@ input {
 .visibility-note {
   margin-top: 0.875rem;
   padding: 0 1.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
   font-size: 0.8125rem;
   color: var(--mid);
   line-height: 1.55;
-  text-align: left;
+  text-align: center;
 }
 
 /* ─────────────────────────────
@@ -517,6 +517,7 @@ input {
   max-width: 600px;
   margin: 0 auto;
   width: 100%;
+  background: var(--bg);
 }
 
 .cal-header {
@@ -530,7 +531,7 @@ input {
 .cal-title {
   font-family: 'Eczar', serif;
   font-size: 1.5rem;
-  font-weight: 500;
+  font-weight: 400;
   letter-spacing: -0.03em;
   line-height: 1;
   color: var(--fg);
@@ -543,13 +544,12 @@ input {
 }
 
 .close-btn {
-  font-size: 1.75rem;
-  line-height: 0.85;
   opacity: 0.4;
   transition: opacity 0.15s;
-  padding: 0.125rem;
-  margin-top: -0.125rem;
+  padding: 0.25rem;
   color: var(--fg);
+  display: flex;
+  align-items: center;
 }
 
 .close-btn:hover {
@@ -583,7 +583,7 @@ input {
 .cal-year-label {
   font-family: 'Eczar', serif;
   font-size: 0.875rem;
-  font-weight: 500;
+  font-weight: 400;
   letter-spacing: -0.01em;
   min-width: 2.75rem;
   flex-shrink: 0;

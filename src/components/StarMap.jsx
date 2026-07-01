@@ -118,8 +118,9 @@ export default function StarMap({ centerStar, extraClass = '' }) {
       ctx.fillStyle = grd;
       ctx.fill();
 
+      const cRotIdx = ((BASE_ROT.get(centerStar.id) ?? 0) + rotFrame) % 4;
       ctx.fillStyle = '#ffffff';
-      drawShape(ctx, cx, cy, cr, BASE_ROT.get(centerStar.id) ?? 0);
+      drawShape(ctx, cx, cy, cr * FRAME_SIZE[cRotIdx], cRotIdx);
     }
 
     function loop(now) {
