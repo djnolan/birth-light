@@ -7,7 +7,8 @@ import CalendarScreen from './components/CalendarScreen';
 import StarMap from './components/StarMap';
 import StopMotionFigure from './components/StopMotionFigure';
 
-const SWAP_DELAY = 600; // ms — wait for content fade before swapping screen
+const SWAP_DELAY = 500;
+const PAN_DURATION = 1800;
 
 export default function App() {
   const [stars, setStars] = useState(() => {
@@ -28,8 +29,10 @@ export default function App() {
   const [showStarMap, setShowStarMap] = useState(() =>
     !!localStorage.getItem('birthlight_birthday')
   );
-  const [starMapEntering, setStarMapEntering] = useState(false);
   const [contentOut, setContentOut] = useState(false);
+
+  // Continuous pan-up transition state: both message + reveal render simultaneously
+  const [isPanningUp, setIsPanningUp] = useState(false);
 
   // Prevent transition animation on first paint
   const [animated, setAnimated] = useState(false);
@@ -54,22 +57,27 @@ export default function App() {
     const upcoming = getUpcomingStars(bd);
     setStars(upcoming);
     setStarIdx(0);
-    setFigureState('message'); // begin zoom immediately
+    setFigureState('message');
     transition('message');
   }
 
   function handleLookUp() {
-    setFigureState('offscreen'); // begin slide-down immediately
-    transition('reveal', () => {
-      setShowStarMap(true);
-      setStarMapEntering(true);
-      setTimeout(() => setStarMapEntering(false), 800);
-    });
+    // Show star map immediately so it's visible behind the sliding panels
+    setShowStarMap(true);
+    // Figure slides off the bottom in sync with the pan
+    setFigureState('offscreen');
+    // Render both screens simultaneously for a continuous pan
+    setIsPanningUp(true);
+    clearT();
+    timerRef.current = setTimeout(() => {
+      setIsPanningUp(false);
+      setScreen('reveal');
+    }, PAN_DURATION);
   }
 
   function handleBack() {
     localStorage.removeItem('birthlight_birthday');
-    setFigureState('home'); // begin slide-up immediately
+    setFigureState('home');
     transition('home', () => {
       setShowStarMap(false);
       setStars([]);
@@ -92,10 +100,7 @@ export default function App() {
   return (
     <div className="app">
       {showStarMap && star && (
-        <StarMap
-          centerStar={star}
-          extraClass={starMapEntering ? 'starmap-canvas--entering' : ''}
-        />
+        <StarMap centerStar={star} />
       )}
 
       <div className={figureClass} aria-hidden="true">
@@ -103,27 +108,49 @@ export default function App() {
       </div>
 
       <div className={`screen-content${contentOut ? ' content-out' : ''}`}>
-        {screen === 'home' && (
-          <HomeScreen onSubmit={handleBirthday} />
-        )}
-        {screen === 'message' && star && (
-          <MessageScreen star={star} onLookUp={handleLookUp} />
-        )}
-        {screen === 'reveal' && star && (
-          <RevealScreen
-            stars={stars}
-            currentIndex={starIdx}
-            onIndexChange={setStarIdx}
-            onBack={handleBack}
-            onCalendar={() => setScreen('calendar')}
-          />
-        )}
-        {screen === 'calendar' && (
-          <CalendarScreen
-            stars={stars}
-            onClose={() => setScreen('reveal')}
-            onStarSelect={handleStarSelect}
-          />
+        {isPanningUp ? (
+          // Continuous pan-up: both screens animate simultaneously
+          <>
+            <div className="pan-slide pan-slide--out">
+              {star && <MessageScreen star={star} onLookUp={() => {}} />}
+            </div>
+            <div className="pan-slide pan-slide--in">
+              {star && (
+                <RevealScreen
+                  stars={stars}
+                  currentIndex={starIdx}
+                  onIndexChange={setStarIdx}
+                  onBack={handleBack}
+                  onCalendar={() => setScreen('calendar')}
+                />
+              )}
+            </div>
+          </>
+        ) : (
+          <>
+            {screen === 'home' && (
+              <HomeScreen onSubmit={handleBirthday} />
+            )}
+            {screen === 'message' && star && (
+              <MessageScreen star={star} onLookUp={handleLookUp} />
+            )}
+            {screen === 'reveal' && star && (
+              <RevealScreen
+                stars={stars}
+                currentIndex={starIdx}
+                onIndexChange={setStarIdx}
+                onBack={handleBack}
+                onCalendar={() => setScreen('calendar')}
+              />
+            )}
+            {screen === 'calendar' && (
+              <CalendarScreen
+                stars={stars}
+                onClose={() => setScreen('reveal')}
+                onStarSelect={handleStarSelect}
+              />
+            )}
+          </>
         )}
       </div>
     </div>

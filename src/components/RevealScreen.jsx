@@ -1,4 +1,4 @@
-import { UserRound, ChevronDown, CalendarDays, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
 import { getStarDisplayName, formatDate, getVisibilityNote } from '../lib/birthLight';
 
 export default function RevealScreen({ stars, currentIndex, onIndexChange, onBack, onCalendar }) {
@@ -10,13 +10,12 @@ export default function RevealScreen({ stars, currentIndex, onIndexChange, onBac
     <div className="reveal-screen">
       <div className="reveal-overlay">
         <div className="reveal-header">
-          <button onClick={onBack} className="header-btn header-btn--stacked" aria-label="Back to home">
-            <UserRound size={17} />
-            <ChevronDown size={13} />
+          <button onClick={onBack} className="header-btn" aria-label="Back to home">
+            <ChevronLeft size={22} />
           </button>
           <div />
           <button onClick={onCalendar} className="header-btn" aria-label="Open calendar">
-            <CalendarDays size={18} />
+            <Calendar size={18} />
           </button>
         </div>
 

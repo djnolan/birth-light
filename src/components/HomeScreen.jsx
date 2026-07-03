@@ -1,56 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { ArrowRight } from 'lucide-react';
 
 const STAR_PATH_D = 'M719.349,186.544C714.037,184.331 708.504,181.011 702.749,176.584C696.995,172.158 692.457,167.731 689.137,163.304C692.015,157.107 695.667,151.297 700.093,145.874C704.52,140.452 708.947,136.191 713.373,133.092C719.128,135.527 724.661,139.124 729.973,143.882C735.285,148.641 739.491,153.234 742.589,157.66C740.376,162.972 737.111,168.34 732.795,173.762C728.479,179.185 723.997,183.446 719.349,186.544Z';
-const STAR_ROT_DEG = [0, -93.6, 93.6, -172.5];
-const FRAME_SIZE = [1.0, 0.76, 1.18, 0.88];
-const STAR_CX = 715.863;
-const STAR_CY = 159.818;
-const STAR_NORM = 1 / 26.73;
-
-const STAR_POS = [
-  { x: 8,  y: 4.5, r: 0.50 }, { x: 22, y: 1.8, r: 0.38 },
-  { x: 38, y: 6.5, r: 0.42 }, { x: 53, y: 1.2, r: 0.55 },
-  { x: 67, y: 4.0, r: 0.38 }, { x: 80, y: 0.8, r: 0.46 },
-  { x: 89, y: 6.0, r: 0.34 }, { x: 96, y: 2.5, r: 0.50 },
-  { x: 15, y: 9.0, r: 0.28 }, { x: 44, y: 8.5, r: 0.36 },
-  { x: 72, y: 7.5, r: 0.30 }, { x: 31, y: 3.0, r: 0.28 },
-  { x: 61, y: 8.0, r: 0.40 }, { x: 86, y: 9.5, r: 0.32 },
-  { x: 4,  y: 11,  r: 0.24 },
-];
-
-function HomeStars() {
-  const [frame, setFrame] = useState(0);
-
-  useEffect(() => {
-    const id = setInterval(() => setFrame(f => (f + 1) % 4), 300);
-    return () => clearInterval(id);
-  }, []);
-
-  return (
-    <svg
-      className="home-stars"
-      viewBox="0 0 100 13"
-      preserveAspectRatio="xMidYMin slice"
-      aria-hidden="true"
-    >
-      {STAR_POS.map(({ x, y, r }, i) => {
-        const phase = i % 4;
-        const rotIdx = (phase + frame) % 4;
-        const deg = STAR_ROT_DEG[rotIdx];
-        const s = (r * STAR_NORM * FRAME_SIZE[rotIdx]).toFixed(5);
-        const opacity = (0.30 + (i % 4) * 0.15).toFixed(3);
-        return (
-          <path
-            key={i}
-            d={STAR_PATH_D}
-            transform={`translate(${x},${y}) rotate(${deg}) scale(${s}) translate(${-STAR_CX},${-STAR_CY})`}
-            fill={`rgba(255,255,255,${opacity})`}
-          />
-        );
-      })}
-    </svg>
-  );
-}
 
 export default function HomeScreen({ onSubmit }) {
   const [value, setValue] = useState('');
@@ -63,8 +14,6 @@ export default function HomeScreen({ onSubmit }) {
 
   return (
     <div className="home-screen">
-      <HomeStars />
-
       <div className="home-content">
         <h1 className="home-headline">
           Find Your<br />Birth Light
@@ -83,13 +32,14 @@ export default function HomeScreen({ onSubmit }) {
             max={new Date().toISOString().split('T')[0]}
             aria-label="Your birthday"
           />
-          <button type="submit" className="submit-btn">
-            Begin ◇
+          <button type="submit" className="star-btn" aria-label="Begin">
+            <svg viewBox="689 133 54 54" className="star-btn-shape" aria-hidden="true">
+              <path d={STAR_PATH_D} fill="currentColor" />
+            </svg>
+            <ArrowRight size={22} className="star-btn-arrow" aria-hidden="true" />
           </button>
         </form>
-        <p className="privacy-note">
-          Saved to your device only.
-        </p>
+        <p className="privacy-note">Saved to your device only.</p>
       </div>
     </div>
   );
