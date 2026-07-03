@@ -8,7 +8,7 @@ import StarMap from './components/StarMap';
 import StopMotionFigure from './components/StopMotionFigure';
 
 const SWAP_DELAY = 500;
-const PAN_DURATION = 1800;
+const PAN_DURATION = 2300;
 
 export default function App() {
   const [stars, setStars] = useState(() => {
@@ -31,10 +31,12 @@ export default function App() {
   );
   const [contentOut, setContentOut] = useState(false);
 
-  // Continuous pan-up transition state: both message + reveal render simultaneously
+  // Continuous pan-up transition: both message + reveal render simultaneously
   const [isPanningUp, setIsPanningUp] = useState(false);
+  // Controls star map entrance animation
+  const [starMapEntering, setStarMapEntering] = useState(false);
 
-  // Prevent transition animation on first paint
+  // Prevent figure transition animation on first paint
   const [animated, setAnimated] = useState(false);
   useEffect(() => { requestAnimationFrame(() => setAnimated(true)); }, []);
 
@@ -57,20 +59,24 @@ export default function App() {
     const upcoming = getUpcomingStars(bd);
     setStars(upcoming);
     setStarIdx(0);
-    setFigureState('message');
-    transition('message');
+    // Figure appears at message position without animating up from below
+    transition('message', () => {
+      setAnimated(false);
+      setFigureState('message');
+      requestAnimationFrame(() => requestAnimationFrame(() => setAnimated(true)));
+    });
   }
 
   function handleLookUp() {
-    // Show star map immediately so it's visible behind the sliding panels
     setShowStarMap(true);
-    // Figure slides off the bottom in sync with the pan
+    setStarMapEntering(true);
+    // Figure slides off the bottom while stars rise
     setFigureState('offscreen');
-    // Render both screens simultaneously for a continuous pan
     setIsPanningUp(true);
     clearT();
     timerRef.current = setTimeout(() => {
       setIsPanningUp(false);
+      setStarMapEntering(false);
       setScreen('reveal');
     }, PAN_DURATION);
   }
@@ -100,7 +106,7 @@ export default function App() {
   return (
     <div className="app">
       {showStarMap && star && (
-        <StarMap centerStar={star} />
+        <StarMap centerStar={star} extraClass={starMapEntering ? 'starmap-canvas--entering' : ''} />
       )}
 
       <div className={figureClass} aria-hidden="true">
@@ -109,7 +115,7 @@ export default function App() {
 
       <div className={`screen-content${contentOut ? ' content-out' : ''}`}>
         {isPanningUp ? (
-          // Continuous pan-up: both screens animate simultaneously
+          // Pan-up: both screens render simultaneously; foregrounds fade, stars/figure do the work
           <>
             <div className="pan-slide pan-slide--out">
               {star && <MessageScreen star={star} onLookUp={() => {}} />}

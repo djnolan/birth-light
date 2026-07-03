@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
+import { House, ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
 import { getStarDisplayName, formatDate, getVisibilityNote } from '../lib/birthLight';
 
 export default function RevealScreen({ stars, currentIndex, onIndexChange, onBack, onCalendar }) {
@@ -11,7 +11,7 @@ export default function RevealScreen({ stars, currentIndex, onIndexChange, onBac
       <div className="reveal-overlay">
         <div className="reveal-header">
           <button onClick={onBack} className="header-btn" aria-label="Back to home">
-            <ChevronLeft size={22} />
+            <House size={18} />
           </button>
           <div />
           <button onClick={onCalendar} className="header-btn" aria-label="Open calendar">
