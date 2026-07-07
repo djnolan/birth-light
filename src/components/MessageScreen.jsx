@@ -12,7 +12,7 @@ export default function MessageScreen({ star, onLookUp }) {
         <svg viewBox="689 133 54 54" className="star-btn-shape" aria-hidden="true">
           <path d={STAR_PATH_D} fill="currentColor" />
         </svg>
-        <ArrowUp size={22} className="star-btn-arrow" aria-hidden="true" />
+        <ArrowUp size={24} className="star-btn-arrow" aria-hidden="true" />
       </button>
 
       <div className="message-body">

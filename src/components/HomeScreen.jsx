@@ -36,7 +36,7 @@ export default function HomeScreen({ onSubmit }) {
             <svg viewBox="689 133 54 54" className="star-btn-shape" aria-hidden="true">
               <path d={STAR_PATH_D} fill="currentColor" />
             </svg>
-            <ArrowRight size={22} className="star-btn-arrow" aria-hidden="true" />
+            <ArrowRight size={24} className="star-btn-arrow" aria-hidden="true" />
           </button>
         </form>
         <p className="privacy-note">Saved to your device only.</p>

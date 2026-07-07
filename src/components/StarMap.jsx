@@ -11,13 +11,10 @@ const STAR_PATH = new Path2D(
 const STAR_CX = 715.863;
 const STAR_CY = 159.818;
 const STAR_HALF = 26.73;
-const ROTATIONS = [0, -1.634, 1.634, -3.011]; // radians
-// Size multipliers per frame — makes rotation frames visually distinct at small sizes
+const ROTATIONS = [0, -1.634, 1.634, -3.011];
 const FRAME_SIZE = [1.0, 0.76, 1.18, 0.88];
 
-// Per-star base rotation index (0-3)
 const BASE_ROT = new Map(starsData.map((s, i) => [s.id, i % 4]));
-// Per-star phase offset — distributed by RA so stars aren't all in sync
 const PHASE_OFF = new Map(starsData.map(s => [s.id, Math.floor(s.ra * 10) % 4]));
 
 function project(ra, dec, ra0, dec0) {
@@ -51,8 +48,28 @@ function drawShape(ctx, px, py, r, rotIdx) {
   ctx.restore();
 }
 
-export default function StarMap({ centerStar, extraClass = '' }) {
+// Ease-out cubic: fast entry, graceful settle
+function easeOut(t) {
+  return 1 - Math.pow(1 - t, 3);
+}
+
+export default function StarMap({ centerStar, isPanning = false, panDuration = 2800, extraClass = '' }) {
   const canvasRef = useRef(null);
+
+  // Mutable pan state — updated every render so the RAF loop always reads latest
+  const panRef = useRef({ isPanning: false, startTime: null, dur: panDuration });
+
+  useEffect(() => {
+    const p = panRef.current;
+    if (isPanning && !p.isPanning) {
+      p.isPanning = true;
+      p.startTime = null; // first draw during pan records the actual start time
+    } else if (!isPanning && p.isPanning) {
+      p.isPanning = false;
+      // keep startTime so the draw loop can reach panProgress = 1.0 naturally
+    }
+    p.dur = panDuration;
+  }, [isPanning, panDuration]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -62,7 +79,7 @@ export default function StarMap({ centerStar, extraClass = '' }) {
     let lastRotFrame = -1;
     let currentW = 0, currentH = 0;
 
-    function draw(rotFrame) {
+    function draw(rotFrame, now) {
       const dpr = window.devicePixelRatio || 1;
       const w = canvas.offsetWidth;
       const h = canvas.offsetHeight;
@@ -76,11 +93,22 @@ export default function StarMap({ centerStar, extraClass = '' }) {
 
       const ctx = canvas.getContext('2d');
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
       const cx = w / 2, cy = h / 2;
-      // Scale so the FOV circle reaches the screen corners, filling the full viewport
       const halfDiag = Math.sqrt(w * w + h * h) / 2;
       const scale = halfDiag / Math.sin(FOV_RADIUS_RAD);
+
+      // Record pan start on first frame
+      const p = panRef.current;
+      if (p.isPanning && p.startTime === null) {
+        p.startTime = now;
+      }
+
+      // panProgress: 0 = stars above screen, 1 = stars at final positions
+      let panProgress = 1.0;
+      if (p.startTime !== null) {
+        const t = Math.min(1, (now - p.startTime) / p.dur);
+        panProgress = easeOut(t);
+      }
 
       ctx.fillStyle = '#0a0a0a';
       ctx.fillRect(0, 0, w, h);
@@ -94,11 +122,19 @@ export default function StarMap({ centerStar, extraClass = '' }) {
         const angDist = Math.acos(Math.min(1, z));
         if (angDist > FOV_RADIUS_RAD) continue;
 
+        const finalPy = cy - y * scale;
+
+        // Parallax: brighter stars (lower mag) start farther above → travel more → move faster
+        // Creates convincing depth as the "camera" tilts upward
+        const normBrightness = Math.max(0, Math.min(1, (6 - star.mag) / 7.5));
+        const parallaxMult = 1 + normBrightness * 0.45; // 1.0× dim … 1.45× bright
+        const panOffsetY = (1 - panProgress) * (-h) * parallaxMult;
+
         const px = cx + x * scale;
-        const py = cy - y * scale;
+        const py = finalPy + panOffsetY;
+
         const r = magToSize(star.mag);
         const fade = 1 - (angDist / FOV_RADIUS_RAD) * 0.65;
-
         const base = BASE_ROT.get(star.id) ?? 0;
         const phase = PHASE_OFF.get(star.id) ?? 0;
         const rotIdx = (base + phase + rotFrame) % 4;
@@ -108,34 +144,43 @@ export default function StarMap({ centerStar, extraClass = '' }) {
         drawShape(ctx, px, py, sr, rotIdx);
       }
 
-      // Center star: radial glow + cut-paper shape
+      // Center star — same parallax treatment
+      const cNorm = Math.max(0, Math.min(1, (6 - centerStar.mag) / 7.5));
+      const cParallaxMult = 1 + cNorm * 0.45;
+      const cPanOffsetY = (1 - panProgress) * (-h) * cParallaxMult;
+      const cCy = cy + cPanOffsetY;
+
       const cr = Math.max(2.5, magToSize(centerStar.mag) * 1.8);
-      const grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, cr * 14);
+      const grd = ctx.createRadialGradient(cx, cCy, 0, cx, cCy, cr * 14);
       grd.addColorStop(0,    'rgba(255,255,255,0.55)');
       grd.addColorStop(0.12, 'rgba(255,255,255,0.18)');
       grd.addColorStop(0.4,  'rgba(255,255,255,0.04)');
       grd.addColorStop(1,    'rgba(255,255,255,0)');
       ctx.beginPath();
-      ctx.arc(cx, cy, cr * 14, 0, Math.PI * 2);
+      ctx.arc(cx, cCy, cr * 14, 0, Math.PI * 2);
       ctx.fillStyle = grd;
       ctx.fill();
 
       const cRotIdx = ((BASE_ROT.get(centerStar.id) ?? 0) + rotFrame) % 4;
       ctx.fillStyle = '#ffffff';
-      drawShape(ctx, cx, cy, cr * FRAME_SIZE[cRotIdx], cRotIdx);
+      drawShape(ctx, cx, cCy, cr * FRAME_SIZE[cRotIdx], cRotIdx);
     }
 
     function loop(now) {
-      const rotFrame = Math.floor(now / 300) % 4; // ~3fps stop-motion
-      if (rotFrame !== lastRotFrame) {
+      const rotFrame = Math.floor(now / 300) % 4;
+      const p = panRef.current;
+      // Draw every frame during pan so movement is smooth; 3fps otherwise for stop-motion feel
+      const panActive = p.startTime !== null && (now - p.startTime) < p.dur;
+
+      if (panActive || rotFrame !== lastRotFrame) {
         lastRotFrame = rotFrame;
-        draw(rotFrame);
+        draw(rotFrame, now);
       }
       animId = requestAnimationFrame(loop);
     }
 
     function onResize() {
-      currentW = 0; // force canvas resize on next draw
+      currentW = 0;
     }
 
     animId = requestAnimationFrame(loop);
