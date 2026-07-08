@@ -356,6 +356,24 @@ input {
   opacity: 1;
 }
 
+/* Wraps star-specific content; layout wrapper for the animated interior */
+.star-text-anim {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+@keyframes starTextIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Only animate when key changes (navigation), not on initial mount */
+.star-text-anim--navigating {
+  animation: starTextIn 0.4s ease-out 0.3s both;
+}
+
 .reveal-top {
   padding: 0.5rem 1.5rem 0;
   text-align: center;
