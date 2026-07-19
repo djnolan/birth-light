@@ -38,6 +38,11 @@ function magToSize(mag) {
   return Math.max(0.6, 3.2 - (mag + 1.5) * (2.6 / 8));
 }
 
+function hexToRgb(hex) {
+  const h = hex.trim().replace('#', '');
+  return [parseInt(h.slice(0,2),16), parseInt(h.slice(2,4),16), parseInt(h.slice(4,6),16)];
+}
+
 function drawShape(ctx, px, py, r, rotIdx) {
   const s = r / STAR_HALF;
   ctx.save();
@@ -49,20 +54,20 @@ function drawShape(ctx, px, py, r, rotIdx) {
   ctx.restore();
 }
 
-function drawCenterStar(ctx, cx, cy, star, rotFrame, alpha) {
+function drawCenterStar(ctx, cx, cy, star, rotFrame, alpha, fgR, fgG, fgB) {
   const cr = Math.max(2.5, magToSize(star.mag) * 1.8);
   if (alpha < 1) ctx.globalAlpha = alpha;
   const grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, cr * 14);
-  grd.addColorStop(0,    `rgba(255,255,255,${0.55 * alpha})`);
-  grd.addColorStop(0.12, `rgba(255,255,255,${0.18 * alpha})`);
-  grd.addColorStop(0.4,  `rgba(255,255,255,${0.04 * alpha})`);
-  grd.addColorStop(1,    'rgba(255,255,255,0)');
+  grd.addColorStop(0,    `rgba(${fgR},${fgG},${fgB},${0.55 * alpha})`);
+  grd.addColorStop(0.12, `rgba(${fgR},${fgG},${fgB},${0.18 * alpha})`);
+  grd.addColorStop(0.4,  `rgba(${fgR},${fgG},${fgB},${0.04 * alpha})`);
+  grd.addColorStop(1,    `rgba(${fgR},${fgG},${fgB},0)`);
   ctx.beginPath();
   ctx.arc(cx, cy, cr * 14, 0, Math.PI * 2);
   ctx.fillStyle = grd;
   ctx.fill();
   const rotIdx = ((BASE_ROT.get(star.id) ?? 0) + rotFrame) % 4;
-  ctx.fillStyle = '#ffffff';
+  ctx.fillStyle = `rgb(${fgR},${fgG},${fgB})`;
   drawShape(ctx, cx, cy, cr * FRAME_SIZE[rotIdx], rotIdx);
   if (alpha < 1) ctx.globalAlpha = 1;
 }
@@ -178,7 +183,11 @@ export default function StarMap({ centerStar, isPanning = false, panDuration = 2
 
       const centerStar = activeTrans ? activeTrans.to : centerStarRef.current;
 
-      ctx.fillStyle = '#0a0a0a';
+      const style = getComputedStyle(document.documentElement);
+      const bgColor = style.getPropertyValue('--bg').trim() || '#0a0908';
+      const [fgR, fgG, fgB] = hexToRgb(style.getPropertyValue('--fg').trim() || '#f2f4f3');
+
+      ctx.fillStyle = bgColor;
       ctx.fillRect(0, 0, w, h);
 
       // ── Background stars ──
@@ -208,7 +217,7 @@ export default function StarMap({ centerStar, isPanning = false, panDuration = 2
         const phase = PHASE_OFF.get(star.id) ?? 0;
         const rotIdx = (base + phase + rotFrame) % 4;
 
-        ctx.fillStyle = `rgba(255,255,255,${(fade * 0.9).toFixed(2)})`;
+        ctx.fillStyle = `rgba(${fgR},${fgG},${fgB},${(fade * 0.9).toFixed(2)})`;
         drawShape(ctx, px, py, r * FRAME_SIZE[rotIdx], rotIdx);
       }
 
@@ -224,7 +233,8 @@ export default function StarMap({ centerStar, isPanning = false, panDuration = 2
             cx + fx * scale,
             cy - fy * scale + fromPanOffY,
             activeTrans.from, rotFrame,
-            1 - activeTrans.ease  // fades out as camera moves away
+            1 - activeTrans.ease,
+            fgR, fgG, fgB
           );
         }
 
@@ -237,14 +247,15 @@ export default function StarMap({ centerStar, isPanning = false, panDuration = 2
             ctx,
             cx + tx * scale,
             cy - ty * scale + toPanOffY,
-            activeTrans.to, rotFrame, 1
+            activeTrans.to, rotFrame, 1,
+            fgR, fgG, fgB
           );
         }
       } else {
         // Normal: center star always at screen center (plus pan offset)
         const normBright = Math.max(0, Math.min(1, (6 - centerStar.mag) / 7.5));
         const panOffsetY = (1 - panProgress) * (-h) * (1 + normBright * 0.45);
-        drawCenterStar(ctx, cx, cy + panOffsetY, centerStar, rotFrame, 1);
+        drawCenterStar(ctx, cx, cy + panOffsetY, centerStar, rotFrame, 1, fgR, fgG, fgB);
       }
     }
 
