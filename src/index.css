@@ -9,9 +9,9 @@
 :root {
   --bg: #222222;
   --fg: #D1DEDE;
-  --muted: #F7C59F;
-  --accent: #E49AB0;
-  --line: rgba(247, 197, 159, 0.2);
+  --muted: #E49AB0;
+  --accent: #F7C59F;
+  --line: rgba(228, 154, 176, 0.2);
 }
 
 html, body, #root {
@@ -344,7 +344,7 @@ input {
   align-items: center;
   justify-content: center;
   padding: 0.25rem;
-  color: var(--fg);
+  color: var(--accent);
 }
 
 .header-btn--stacked {
@@ -412,7 +412,7 @@ input {
   padding: 0.875rem 0.75rem;
   opacity: 0.38;
   transition: opacity 0.15s;
-  color: var(--fg);
+  color: var(--accent);
   line-height: 1;
 }
 
@@ -556,7 +556,7 @@ input {
   opacity: 0.4;
   transition: opacity 0.15s;
   padding: 0.25rem;
-  color: var(--fg);
+  color: var(--accent);
   display: flex;
   align-items: center;
 }
