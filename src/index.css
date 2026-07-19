@@ -7,10 +7,10 @@
 }
 
 :root {
-  --bg: #1E152A;
-  --fg: #FFEAEC;
+  --bg: #170312;
+  --fg: #F6E8EA;
   --muted: #8D99AE;
-  --accent: #E36397;
+  --accent: #EFCB68;
   --line: rgba(141, 153, 174, 0.2);
 }
 
