@@ -7,11 +7,11 @@
 }
 
 :root {
-  --bg: #0A0908;
-  --fg: #F2F4F3;
-  --muted: #B0B5B3;
-  --accent: #D0C4DF;
-  --line: rgba(176, 181, 179, 0.2);
+  --bg: #222222;
+  --fg: #D1DEDE;
+  --muted: #F7C59F;
+  --accent: #E49AB0;
+  --line: rgba(247, 197, 159, 0.2);
 }
 
 html, body, #root {
