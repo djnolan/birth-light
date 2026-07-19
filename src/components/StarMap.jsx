@@ -184,8 +184,8 @@ export default function StarMap({ centerStar, isPanning = false, panDuration = 2
       const centerStar = activeTrans ? activeTrans.to : centerStarRef.current;
 
       const style = getComputedStyle(document.documentElement);
-      const bgColor = style.getPropertyValue('--bg').trim() || '#222222';
-      const [fgR, fgG, fgB] = hexToRgb(style.getPropertyValue('--fg').trim() || '#d1dede');
+      const bgColor = style.getPropertyValue('--bg').trim() || '#1a181b';
+      const [fgR, fgG, fgB] = hexToRgb(style.getPropertyValue('--fg').trim() || '#fffffc');
 
       ctx.fillStyle = bgColor;
       ctx.fillRect(0, 0, w, h);
