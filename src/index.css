@@ -115,6 +115,7 @@ input {
   object-fit: contain;
   object-position: center bottom;
   display: block;
+  filter: grayscale(0.55) sepia(0.3) hue-rotate(175deg) saturate(0.55) brightness(0.8);
 }
 
 /* Only animate after first render */
@@ -183,6 +184,10 @@ input {
   width: 100%;
 }
 
+.home-form .star-btn {
+  margin-top: 1rem;
+}
+
 .date-label {
   font-size: 0.75rem;
   letter-spacing: 0.08em;
@@ -200,7 +205,7 @@ input {
   width: 100%;
   height: 48px;
   padding: 0 2.75rem 0 1rem;
-  border: 1.5px solid var(--accent);
+  border: 1.5px solid var(--fg);
   border-radius: 0;
   background: transparent;
   font-size: 1rem;
@@ -241,13 +246,13 @@ input {
 
 /* ── Flatpickr theme overrides ── */
 .flatpickr-calendar {
-  background: var(--bg);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 0;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
-  font-family: 'DM Sans', sans-serif;
+  background: var(--bg) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 0 !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5) !important;
+  font-family: 'DM Sans', sans-serif !important;
   font-size: 0.8125rem;
-  color: var(--fg);
+  color: var(--fg) !important;
   width: 240px;
 }
 
@@ -264,50 +269,67 @@ input {
 }
 
 .flatpickr-months .flatpickr-month {
-  background: transparent;
-  color: var(--fg);
+  background: transparent !important;
+  color: var(--fg) !important;
   height: 2rem;
 }
 
 .flatpickr-current-month {
-  font-family: 'Eczar', serif;
-  font-size: 1rem;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9375rem;
   font-weight: 400;
-  color: var(--fg);
+  color: var(--fg) !important;
   padding-top: 0;
 }
 
 .flatpickr-current-month .numInputWrapper {
-  width: 4.5ch;
+  display: none;
 }
 
 .flatpickr-current-month input.cur-year {
   color: var(--fg);
-  font-family: 'Eczar', serif;
+  font-family: 'DM Sans', sans-serif;
   font-weight: 400;
 }
 
 .flatpickr-current-month .flatpickr-monthDropdown-months {
-  background: var(--bg);
-  color: var(--fg);
-  font-family: 'Eczar', serif;
+  background: var(--bg) !important;
+  color: var(--fg) !important;
+  font-family: 'DM Sans', sans-serif;
   font-weight: 400;
   -webkit-appearance: none;
   appearance: none;
 }
 
+.flatpickr-year-select {
+  background: var(--bg);
+  color: var(--fg);
+  border: none;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9375rem;
+  font-weight: 400;
+  cursor: pointer;
+  padding: 0 0.25rem;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.flatpickr-year-select:focus {
+  outline: none;
+}
+
 .flatpickr-months .flatpickr-prev-month,
 .flatpickr-months .flatpickr-next-month {
-  color: var(--fg);
-  fill: var(--fg);
+  color: var(--fg) !important;
+  fill: var(--fg) !important;
   padding: 6px 10px;
   top: 6px;
 }
 
 .flatpickr-months .flatpickr-prev-month:hover,
 .flatpickr-months .flatpickr-next-month:hover {
-  color: var(--accent);
-  fill: var(--accent);
+  color: var(--accent) !important;
+  fill: var(--accent) !important;
 }
 
 .flatpickr-months .flatpickr-prev-month svg,
@@ -322,8 +344,8 @@ input {
 }
 
 .flatpickr-weekday {
-  background: transparent;
-  color: var(--muted);
+  background: transparent !important;
+  color: var(--muted) !important;
   font-size: 0.6875rem;
   letter-spacing: 0.06em;
   font-weight: 400;
@@ -342,10 +364,10 @@ input {
 }
 
 .flatpickr-day {
-  background: transparent;
-  border: none;
-  border-radius: 0;
-  color: var(--fg);
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  color: var(--fg) !important;
   max-width: 32px;
   height: 32px;
   line-height: 32px;
@@ -355,40 +377,40 @@ input {
 
 .flatpickr-day:hover,
 .flatpickr-day:focus {
-  background: var(--accent);
-  color: var(--bg);
-  border-color: transparent;
+  background: var(--accent) !important;
+  color: var(--bg) !important;
+  border-color: transparent !important;
 }
 
 .flatpickr-day.selected,
 .flatpickr-day.selected:hover {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--bg);
+  background: var(--accent) !important;
+  border-color: var(--accent) !important;
+  color: var(--bg) !important;
 }
 
 .flatpickr-day.today {
-  border-color: var(--muted);
-  color: var(--fg);
+  border-color: var(--muted) !important;
+  color: var(--fg) !important;
 }
 
 .flatpickr-day.today:hover {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--bg);
+  background: var(--accent) !important;
+  border-color: var(--accent) !important;
+  color: var(--bg) !important;
 }
 
 .flatpickr-day.prevMonthDay,
 .flatpickr-day.nextMonthDay {
-  color: var(--muted);
+  color: var(--muted) !important;
   opacity: 0.35;
 }
 
 .flatpickr-day.flatpickr-disabled,
 .flatpickr-day.flatpickr-disabled:hover {
-  color: var(--muted);
+  color: var(--muted) !important;
   opacity: 0.25;
-  background: transparent;
+  background: transparent !important;
   cursor: default;
 }
 
@@ -425,8 +447,9 @@ input {
 
 .star-btn-shape {
   display: block;
-  width: 70px;
-  height: 70px;
+  width: 58px;
+  height: 58px;
+  overflow: visible;
 }
 
 .star-btn-arrow {
@@ -464,6 +487,7 @@ input {
   flex-direction: column;
   align-items: center;
   overflow: hidden;
+  animation: screenScaleIn 0.45s ease-out both;
 }
 
 .message-body {
@@ -477,9 +501,11 @@ input {
 
 .message-text {
   text-align: center;
-  font-size: clamp(0.9375rem, 3vw, 1.0625rem);
-  line-height: 1.75;
-  max-width: 32ch;
+  font-family: 'Eczar', serif;
+  font-size: clamp(1rem, 3.25vw, 1.125rem);
+  font-weight: 400;
+  line-height: 1.7;
+  max-width: 30ch;
   color: var(--fg);
 }
 
@@ -555,8 +581,13 @@ input {
 }
 
 @keyframes starTextIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes screenScaleIn {
+  from { opacity: 0; transform: scale(1.03); }
+  to   { opacity: 1; transform: scale(1); }
 }
 
 /* Only animate when key changes (navigation), not on initial mount */
@@ -581,9 +612,9 @@ input {
 
 .star-distance {
   font-family: 'Eczar', serif;
-  font-size: clamp(0.875rem, 3vw, 1.0625rem);
-  font-style: italic;
-  font-weight: 400;
+  font-size: clamp(1rem, 3.5vw, 1.25rem);
+  font-style: normal;
+  font-weight: 500;
   color: var(--muted);
   margin-top: 0.3rem;
 }

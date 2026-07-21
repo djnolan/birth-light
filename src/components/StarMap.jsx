@@ -54,22 +54,29 @@ function drawShape(ctx, px, py, r, rotIdx) {
   ctx.restore();
 }
 
+// Banded glow layers: same star shape, progressively larger + more transparent
+const GLOW_LAYERS = [
+  { scale: 5.0, opacity: 0.030 },
+  { scale: 3.5, opacity: 0.055 },
+  { scale: 2.4, opacity: 0.090 },
+  { scale: 1.7, opacity: 0.150 },
+  { scale: 1.28, opacity: 0.250 },
+];
+
 function drawCenterStar(ctx, cx, cy, star, rotFrame, alpha, fgR, fgG, fgB) {
   const cr = Math.max(2.5, magToSize(star.mag) * 1.8);
-  if (alpha < 1) ctx.globalAlpha = alpha;
-  const grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, cr * 14);
-  grd.addColorStop(0,    `rgba(${fgR},${fgG},${fgB},${0.55 * alpha})`);
-  grd.addColorStop(0.12, `rgba(${fgR},${fgG},${fgB},${0.18 * alpha})`);
-  grd.addColorStop(0.4,  `rgba(${fgR},${fgG},${fgB},${0.04 * alpha})`);
-  grd.addColorStop(1,    `rgba(${fgR},${fgG},${fgB},0)`);
-  ctx.beginPath();
-  ctx.arc(cx, cy, cr * 14, 0, Math.PI * 2);
-  ctx.fillStyle = grd;
-  ctx.fill();
   const rotIdx = ((BASE_ROT.get(star.id) ?? 0) + rotFrame) % 4;
+  const baseR = cr * FRAME_SIZE[rotIdx];
+
   ctx.fillStyle = `rgb(${fgR},${fgG},${fgB})`;
-  drawShape(ctx, cx, cy, cr * FRAME_SIZE[rotIdx], rotIdx);
-  if (alpha < 1) ctx.globalAlpha = 1;
+  for (const { scale, opacity } of GLOW_LAYERS) {
+    ctx.globalAlpha = opacity * alpha;
+    drawShape(ctx, cx, cy, baseR * scale, rotIdx);
+  }
+
+  ctx.globalAlpha = alpha < 1 ? alpha : 1;
+  drawShape(ctx, cx, cy, baseR, rotIdx);
+  ctx.globalAlpha = 1;
 }
 
 // Quadratic ease-in-out: smooth start and finish
