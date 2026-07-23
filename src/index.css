@@ -185,7 +185,8 @@ input {
 }
 
 .home-form .star-btn {
-  margin-top: 1rem;
+  margin-top: 2.25rem;
+  margin-bottom: 4.5rem;
 }
 
 .date-label {
@@ -282,7 +283,7 @@ input {
   padding-top: 0;
 }
 
-.flatpickr-current-month .numInputWrapper {
+.flatpickr-current-month .numInputWrapper span {
   display: none;
 }
 
@@ -611,8 +612,8 @@ input {
 }
 
 .star-distance {
-  font-family: 'Eczar', serif;
-  font-size: clamp(1rem, 3.5vw, 1.25rem);
+  font-family: 'DM Sans', sans-serif;
+  font-size: clamp(0.9375rem, 3.25vw, 1.0625rem);
   font-style: normal;
   font-weight: 500;
   color: var(--muted);
@@ -662,10 +663,10 @@ input {
 }
 
 .birth-age {
-  font-family: 'Eczar', serif;
-  font-size: clamp(0.875rem, 3vw, 1.0625rem);
-  font-weight: 400;
-  font-style: italic;
+  font-family: 'DM Sans', sans-serif;
+  font-size: clamp(0.9375rem, 3.25vw, 1.0625rem);
+  font-weight: 500;
+  font-style: normal;
   color: var(--muted);
   margin-top: 0.3rem;
 }

@@ -6,15 +6,13 @@ const STAR_PATH_D = 'M719.349,186.544C714.037,184.331 708.504,181.011 702.749,17
 const STAR_CX = 715.863;
 const STAR_CY = 159.818;
 
-// 3 subtle outer layers for the button glow
 const BTN_GLOW = [
-  { scale: 2.1, opacity: 0.04 },
-  { scale: 1.55, opacity: 0.08 },
-  { scale: 1.2,  opacity: 0.13 },
+  { scale: 1.65, opacity: 0.07, rotDeg:  3 },
+  { scale: 1.2,  opacity: 0.13, rotDeg: -2 },
 ];
 
-function glowTransform(scale) {
-  return `translate(${STAR_CX},${STAR_CY}) scale(${scale}) translate(${-STAR_CX},${-STAR_CY})`;
+function glowTransform(scale, rotDeg = 0) {
+  return `translate(${STAR_CX},${STAR_CY}) rotate(${rotDeg}) scale(${scale}) translate(${-STAR_CX},${-STAR_CY})`;
 }
 
 export default function HomeScreen({ onSubmit }) {
@@ -100,9 +98,9 @@ export default function HomeScreen({ onSubmit }) {
           </div>
           <button type="submit" className="star-btn" aria-label="Begin">
             <svg viewBox="689 133 54 54" className="star-btn-shape" aria-hidden="true">
-              {BTN_GLOW.map(({ scale, opacity }, i) => (
+              {BTN_GLOW.map(({ scale, opacity, rotDeg }, i) => (
                 <path key={i} d={STAR_PATH_D} fill="currentColor" opacity={opacity}
-                  transform={glowTransform(scale)} />
+                  transform={glowTransform(scale, rotDeg)} />
               ))}
               <path d={STAR_PATH_D} fill="currentColor" />
             </svg>
