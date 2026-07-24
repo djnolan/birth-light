@@ -104,8 +104,8 @@ input {
   position: fixed;
   bottom: 0;
   left: 50%;
-  width: 105vw;
-  height: calc(105vw * 0.5625); /* 16:9 landscape */
+  width: 125vw;
+  height: calc(125vw * 0.5625); /* 16:9 landscape */
   z-index: 1;
   pointer-events: none;
   overflow: hidden;
@@ -811,10 +811,13 @@ input {
 }
 
 .cal-key-label {
-  color: var(--fg);
+  width: 100%;
+  color: var(--muted);
+  font-size: 0.625rem;
   font-weight: 500;
-  letter-spacing: 0.04em;
-  flex-shrink: 0;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.1rem;
 }
 
 .cal-key-item {
