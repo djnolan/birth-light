@@ -6,8 +6,8 @@ const STAR_CX = 715.863;
 const STAR_CY = 159.818;
 
 const BTN_GLOW = [
-  { scale: 1.65, opacity: 0.07, rotDeg:  3 },
-  { scale: 1.2,  opacity: 0.13, rotDeg: -2 },
+  { scale: 1.70, opacity: 0.07, rotDeg:  3 },
+  { scale: 1.35, opacity: 0.13, rotDeg: -2 },
 ];
 
 function glowTransform(scale, rotDeg = 0) {

@@ -51,7 +51,7 @@ export default function CalendarScreen({ stars, onClose, onStarSelect }) {
       <div className="cal-years">
         {years.map(({ year, stars: yearStars }) => (
           <div key={year} className="cal-year-row">
-            <div className="cal-year-label">{year}</div>
+            <button className="cal-year-label" onClick={() => handleDotClick(yearStars[0].id)}>{year}</button>
             <div className="cal-timeline">
               <div className="cal-line" />
               {yearStars.map(star => (

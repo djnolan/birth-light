@@ -43,27 +43,23 @@ function hexToRgb(hex) {
   return [parseInt(h.slice(0,2),16), parseInt(h.slice(2,4),16), parseInt(h.slice(4,6),16)];
 }
 
-function drawShape(ctx, px, py, r, rotIdx, extraRot = 0) {
+function drawShape(ctx, px, py, r, rotIdx) {
   const s = r / STAR_HALF;
   ctx.save();
   ctx.translate(px, py);
-  ctx.rotate(ROTATIONS[rotIdx] + extraRot);
+  ctx.rotate(ROTATIONS[rotIdx]);
   ctx.scale(s, s);
   ctx.translate(-STAR_CX, -STAR_CY);
   ctx.fill(STAR_PATH);
   ctx.restore();
 }
 
-let _ringCanvas = null;
-let _ringCtx = null;
-
-// True ring glow: each layer is an equal-width annular band (destination-out subtraction).
-// Step size = 0.45× baseR per ring; slight rotation variation per layer.
-const RING_LAYERS = [
-  { outerScale: 2.72, innerScale: 2.27, opacity: 0.06, extraRot: -4 * DEG },
-  { outerScale: 2.27, innerScale: 1.82, opacity: 0.09, extraRot:  3 * DEG },
-  { outerScale: 1.82, innerScale: 1.37, opacity: 0.14, extraRot: -2 * DEG },
-  { outerScale: 1.37, innerScale: 0.92, opacity: 0.22, extraRot:  1 * DEG },
+// Banded glow layers: same star shape, progressively larger + more transparent
+const GLOW_LAYERS = [
+  { scale: 4.0,  opacity: 0.040 },
+  { scale: 2.75, opacity: 0.070 },
+  { scale: 1.95, opacity: 0.115 },
+  { scale: 1.45, opacity: 0.240 },
 ];
 
 function drawCenterStar(ctx, cx, cy, star, rotFrame, alpha, fgR, fgG, fgB) {
@@ -72,34 +68,9 @@ function drawCenterStar(ctx, cx, cy, star, rotFrame, alpha, fgR, fgG, fgB) {
   const baseR = cr * FRAME_SIZE[rotIdx];
 
   ctx.fillStyle = `rgb(${fgR},${fgG},${fgB})`;
-
-  for (const { outerScale, innerScale, opacity, extraRot } of RING_LAYERS) {
-    const outerR = baseR * outerScale;
-    const size = Math.ceil(outerR * 2) + 8;
-    const center = size / 2;
-
-    if (!_ringCanvas) {
-      _ringCanvas = document.createElement('canvas');
-      _ringCtx = _ringCanvas.getContext('2d');
-    }
-    if (_ringCanvas.width < size || _ringCanvas.height < size) {
-      _ringCanvas.width = size;
-      _ringCanvas.height = size;
-    }
-
-    _ringCtx.clearRect(0, 0, _ringCanvas.width, _ringCanvas.height);
-    _ringCtx.globalCompositeOperation = 'source-over';
-    _ringCtx.fillStyle = `rgb(${fgR},${fgG},${fgB})`;
-    _ringCtx.globalAlpha = 1;
-    drawShape(_ringCtx, center, center, outerR, rotIdx, extraRot);
-
-    _ringCtx.globalCompositeOperation = 'destination-out';
-    _ringCtx.globalAlpha = 1;
-    drawShape(_ringCtx, center, center, baseR * innerScale, rotIdx, 0);
-    _ringCtx.globalCompositeOperation = 'source-over';
-
+  for (const { scale, opacity } of GLOW_LAYERS) {
     ctx.globalAlpha = opacity * alpha;
-    ctx.drawImage(_ringCanvas, 0, 0, size, size, cx - center, cy - center, size, size);
+    drawShape(ctx, cx, cy, baseR * scale, rotIdx);
   }
 
   ctx.globalAlpha = alpha < 1 ? alpha : 1;
