@@ -43,9 +43,10 @@ export default function CalendarScreen({ stars, onClose, onStarSelect }) {
       </div>
 
       <div className="cal-key">
-        <span className="cal-dot cal-dot--northern" /> Northern
-        <span className="cal-dot cal-dot--southern" /> Southern
-        <span className="cal-dot cal-dot--both" /> Both
+        <span className="cal-key-label">Visibility</span>
+        <span className="cal-key-item"><span className="cal-dot cal-dot--northern" /> Northern hemisphere</span>
+        <span className="cal-key-item"><span className="cal-dot cal-dot--southern" /> Southern hemisphere</span>
+        <span className="cal-key-item"><span className="cal-dot cal-dot--both" /> Both</span>
       </div>
 
       <div className="cal-years">

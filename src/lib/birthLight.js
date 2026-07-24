@@ -34,7 +34,7 @@ export function getVisibilityNote(star) {
     star.hemisphere === 'both'
       ? 'from both hemispheres'
       : `from the ${star.hemisphere} hemisphere`;
-  return `Visible to the naked eye ${hemi} — best viewed on ${star.bestSeason} evenings.`;
+  return `Visible to the naked eye ${hemi}\nBest viewed on ${star.bestSeason} evenings`;
 }
 
 export function getRevealText(star, variant) {
