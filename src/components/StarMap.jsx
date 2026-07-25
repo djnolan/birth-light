@@ -78,14 +78,14 @@ function drawCenterStar(ctx, cx, cy, star, rotFrame, alpha, fgR, fgG, fgB) {
   ctx.globalAlpha = 1;
 }
 
-// Quadratic ease-in-out: smooth start and finish
+// Ease-in-out with quartic landing: snappy start, very gradual settle
 function easeInOut(t) {
-  return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+  return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 4) / 2;
 }
 
-// Ease-out quintic: fast entry, very gradual landing (used for camera pan-up)
+// Ease-out cubic: fast entry, graceful settle (used for camera pan-up)
 function easeOut(t) {
-  return 1 - Math.pow(1 - t, 5);
+  return 1 - Math.pow(1 - t, 3);
 }
 
 export default function StarMap({ centerStar, isPanning = false, panDuration = 2800, extraClass = '' }) {
