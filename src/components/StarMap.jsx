@@ -83,9 +83,9 @@ function easeInOut(t) {
   return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
 }
 
-// Ease-out cubic: fast entry, graceful settle (used for camera pan-up)
+// Ease-out quintic: fast entry, very gradual landing (used for camera pan-up)
 function easeOut(t) {
-  return 1 - Math.pow(1 - t, 3);
+  return 1 - Math.pow(1 - t, 5);
 }
 
 export default function StarMap({ centerStar, isPanning = false, panDuration = 2800, extraClass = '' }) {
