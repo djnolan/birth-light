@@ -584,6 +584,27 @@ input {
   opacity: 1;
 }
 
+.header-ghost-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header-ghost-svg {
+  width: 2rem;
+  height: 2rem;
+}
+
+.header-ghost-icon {
+  position: absolute;
+}
+
+.header-grid-svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
 /* Wraps star-specific content; layout wrapper for the animated interior */
 .star-text-anim {
   display: flex;
@@ -694,59 +715,19 @@ input {
 
 /* ─────────────────────────────
    HEMISPHERE DOTS
-   (shared: reveal + calendar)
+   (calendar — SVG diamond shape)
 ───────────────────────────── */
-.hemi-dot,
-.cal-dot {
+.cal-dot-svg {
   display: inline-block;
-  border-radius: 50%;
-  border: 1px solid var(--fg);
-  position: relative;
-  overflow: hidden;
   flex-shrink: 0;
+  width: 0.875rem;
+  height: 0.875rem;
+  color: var(--fg);
 }
 
-.hemi-dot {
-  width: 10px;
-  height: 10px;
-}
-
-.cal-dot {
-  width: 9px;
-  height: 9px;
-}
-
-.cal-key .cal-dot {
-  width: 8px;
-  height: 8px;
-}
-
-.hemi-dot--northern::before,
-.hemi-dot--southern::before,
-.cal-dot--northern::before,
-.cal-dot--southern::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  background: var(--fg);
-}
-
-.hemi-dot--northern::before,
-.cal-dot--northern::before {
-  top: 0;
-  height: 50%;
-}
-
-.hemi-dot--southern::before,
-.cal-dot--southern::before {
-  bottom: 0;
-  height: 50%;
-}
-
-.hemi-dot--both,
-.cal-dot--both {
-  background: var(--fg);
+.cal-key .cal-dot-svg {
+  width: 0.8rem;
+  height: 0.8rem;
 }
 
 /* ─────────────────────────────
