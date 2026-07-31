@@ -11,7 +11,7 @@ const FIGURE_FRAMES = Object.entries(figureModules)
   .map(([, m]) => m.default);
 
 // phase: 'static' (flat line, frozen) | 'intro' (play intro→loop) | 'loop' (figure loop only)
-export default function StopMotionFigure({ phase = 'loop', fps = 3, className = '' }) {
+export default function StopMotionFigure({ phase = 'loop', fps = 3, introFps = 6, className = '' }) {
   const [src, setSrc] = useState(
     phase === 'loop' ? FIGURE_FRAMES[0] : INTRO_FRAMES[0]
   );
@@ -27,7 +27,8 @@ export default function StopMotionFigure({ phase = 'loop', fps = 3, className = 
     let inIntro = phase === 'intro';
     setSrc(frames[0]);
 
-    const id = setInterval(() => {
+    let id;
+    function tick() {
       idx++;
       if (inIntro && idx >= INTRO_FRAMES.length) {
         frames = FIGURE_FRAMES;
@@ -37,10 +38,12 @@ export default function StopMotionFigure({ phase = 'loop', fps = 3, className = 
         idx = idx % frames.length;
       }
       setSrc(frames[idx]);
-    }, 1000 / fps);
+      id = setTimeout(tick, 1000 / (inIntro ? introFps : fps));
+    }
+    id = setTimeout(tick, 1000 / (inIntro ? introFps : fps));
 
-    return () => clearInterval(id);
-  }, [phase, fps]);
+    return () => clearTimeout(id);
+  }, [phase, fps, introFps]);
 
   return (
     <img
