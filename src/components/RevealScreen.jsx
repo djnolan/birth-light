@@ -6,7 +6,7 @@ const STAR_PATH_D = 'M719.349,186.544C714.037,184.331 708.504,181.011 702.749,17
 const STAR_CX = 715.863;
 const STAR_CY = 159.818;
 
-const GRID_ROTS = [8, -6, 11, -9, 4, -7, 6, -10, 9];
+const GRID_ROTS = [4, -3, 5, -4, 2, -3, 3, -5, 4];
 
 function StarGridIcon() {
   const s = 5 / 54;
