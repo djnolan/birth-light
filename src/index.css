@@ -126,9 +126,9 @@ input {
   transition: transform 2s ease-in;
 }
 
-/* Home: figure hidden below viewport */
+/* Home: flat line visible at bottom */
 .figure-layer--home {
-  transform: translateX(-50%) translateY(115%);
+  transform: translateX(-50%) translateY(0);
 }
 
 /* Message: figure visible at bottom, full landscape */

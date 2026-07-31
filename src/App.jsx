@@ -26,6 +26,11 @@ export default function App() {
     localStorage.getItem('birthlight_birthday') ? 'offscreen' : 'home'
   );
 
+  // 'static' (flat line) | 'intro' (line→figure transition) | 'loop' (figure loop)
+  const [figurePhase, setFigurePhase] = useState(() =>
+    localStorage.getItem('birthlight_birthday') ? 'loop' : 'static'
+  );
+
   const [showStarMap, setShowStarMap] = useState(() =>
     !!localStorage.getItem('birthlight_birthday')
   );
@@ -56,7 +61,7 @@ export default function App() {
     const upcoming = getUpcomingStars(bd);
     setStars(upcoming);
     setStarIdx(0);
-    // Figure appears at message position without animating up from below
+    setFigurePhase('intro'); // kick off line→figure animation immediately
     transition('message', () => {
       setAnimated(false);
       setFigureState('message');
@@ -77,6 +82,7 @@ export default function App() {
 
   function handleBack() {
     localStorage.removeItem('birthlight_birthday');
+    setFigurePhase('static'); // revert to flat line
     setFigureState('home');
     transition('home', () => {
       setShowStarMap(false);
@@ -104,7 +110,7 @@ export default function App() {
       )}
 
       <div className={figureClass} aria-hidden="true">
-        <StopMotionFigure />
+        <StopMotionFigure phase={figurePhase} />
       </div>
 
       <div className={`screen-content${contentOut ? ' content-out' : ''}`}>
