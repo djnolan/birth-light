@@ -49,7 +49,7 @@ export default function RevealScreen({ stars, currentIndex, onIndexChange, onBac
               <svg viewBox="689 133 54 54" className="header-ghost-svg" aria-hidden="true">
                 <path d={STAR_PATH_D} fill="none" stroke="currentColor" strokeWidth="2.5" />
               </svg>
-              <ArrowLeft size={13} className="header-ghost-icon" />
+              <ArrowLeft size={15} className="header-ghost-icon" />
             </span>
           </button>
           <div />
