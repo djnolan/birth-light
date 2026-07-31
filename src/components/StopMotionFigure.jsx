@@ -11,7 +11,7 @@ const FIGURE_FRAMES = Object.entries(figureModules)
   .map(([, m]) => m.default);
 
 // phase: 'static' (flat line, frozen) | 'intro' (play intro→loop) | 'loop' (figure loop only)
-export default function StopMotionFigure({ phase = 'loop', fps = 3, introFps = 6, className = '' }) {
+export default function StopMotionFigure({ phase = 'loop', fps = 3, introFps = 9, className = '' }) {
   const [src, setSrc] = useState(
     phase === 'loop' ? FIGURE_FRAMES[0] : INTRO_FRAMES[0]
   );
