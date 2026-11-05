@@ -11,6 +11,7 @@ import { panProgress } from '../lib/lookUpTimeline';
 // ms = how long each frame holds.
 const MORPH_FRAMES = {
   open:   { steps: [0.45, 0.8, 1], ms: 70 },
+  peek:   { steps: [0.4, 0.75, 1], ms: 90 },
   up:     { steps: [0.35, 0.7, 1], ms: 110 },
   closed: { steps: [0.5, 1], ms: 90 },
 };
@@ -37,7 +38,9 @@ function frameAt(elapsed, frames) {
 
 /**
  * The eye button. It lives in a fixed frame and steps between states:
- *   closed (home) → open (message, blinks) → up (look-up sequence)
+ *   closed (home, no date) → open (home, date picked) → peek (message:
+ *   looking up, regular size) → up (look-up sequence: bigger and higher)
+ * open and peek both blink.
  * position: 'in' (resting on screen) | 'out' (below the screen)
  * panStartAt: while set, the eye rides the camera pan off the bottom.
  * disabled: shown in a quieter style and can't be tapped (home, before a
@@ -106,7 +109,7 @@ export default function EyeButton({ state, position, panStartAt, disabled = fals
       l.shape = shape;
 
       let drawn = shape;
-      if (l.state === 'open' && !l.morph && !reduceMotion) {
+      if ((l.state === 'open' || l.state === 'peek') && !l.morph && !reduceMotion) {
         if (!l.blink && now >= l.nextBlinkAt) l.blink = { start: now };
         if (l.blink) {
           const i = frameAt(now - l.blink.start, BLINK_FRAMES);

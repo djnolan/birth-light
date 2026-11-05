@@ -21,7 +21,8 @@ export default function App() {
   const [starIdx, setStarIdx] = useState(0);
   const [screen, setScreen] = useState(() => (hasSaved() ? 'reveal' : 'home'));
 
-  // Eye: 'closed' (home) | 'open' (message) | 'up' (look-up sequence)
+  // Eye: 'closed' (home, no date) | 'open' (home, date picked)
+  //      | 'peek' (message: looking up) | 'up' (look-up sequence)
   const [eyeState, setEyeState] = useState(() => (hasSaved() ? 'up' : 'closed'));
   // 'in' (on screen) | 'out' (below the screen)
   const [eyePosition, setEyePosition] = useState(() => (hasSaved() ? 'out' : 'in'));
@@ -56,8 +57,7 @@ export default function App() {
     localStorage.setItem('birthlight_birthday', bd);
     setStars(getUpcomingStars(bd));
     setStarIdx(0);
-    setEyeState('open');
-    transition('message');
+    transition('message', () => setEyeState('peek'));
   }
 
   function handleLookUp() {
@@ -136,7 +136,10 @@ export default function App() {
         {screen === 'home' && (
           <HomeScreen
             onSubmit={handleBirthday}
-            onDateChange={setPendingDate}
+            onDateChange={d => {
+              setPendingDate(d);
+              setEyeState(d ? 'open' : 'closed');
+            }}
           />
         )}
         {screen === 'message' && star && (

@@ -55,9 +55,23 @@ const CLOSED_PUPIL = FLAT.open.pupil.map((v, i) =>
   i % 2 === 0 ? 1170 + (v - 1170) * 0.6 : 3690 + (v - 3600) * 0.05
 );
 
+// Peek: the looking-up eye from button-3, shrunk back to the regular button
+// size and position (undoing button-3's scale(1.13459) + translate).
+const unScaleUp = arr => arr.map((v, i) =>
+  i % 2 === 0 ? (v + 157.469) / 1.13459 : (v + 724.521) / 1.13459
+);
+const PEEK = {
+  bg3: unScaleUp(FLAT.up.bg3),
+  bg2: unScaleUp(FLAT.up.bg2),
+  bg1: unScaleUp(FLAT.up.bg1),
+  eye: FLAT.open.eye,
+  pupil: unScaleUp(FLAT.up.pupil),
+};
+
 export const EYE_STATES = {
   closed: { ...FLAT.closed, eye: CLOSED_EYE, pupil: CLOSED_PUPIL, pupilOpacity: 0 },
   open:   { ...FLAT.open, pupilOpacity: 1 },
+  peek:   { ...PEEK, pupilOpacity: 1 },
   up:     { ...FLAT.up, pupilOpacity: 1 },
 };
 
