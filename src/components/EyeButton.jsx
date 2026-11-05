@@ -40,7 +40,8 @@ function frameAt(elapsed, frames) {
  *   closed (home) → open (message, blinks) → up (look-up sequence)
  * position: 'in' (resting on screen) | 'out' (below the screen)
  * panStartAt: while set, the eye rides the camera pan off the bottom.
- * disabled: shown dimmed and can't be tapped (home, before a date is picked).
+ * disabled: shown in a quieter style and can't be tapped (home, before a
+ *   date is picked).
  */
 export default function EyeButton({ state, position, panStartAt, disabled = false, frameRef, onClick, label }) {
   const moveRef = useRef(null);
@@ -193,6 +194,7 @@ export default function EyeButton({ state, position, panStartAt, disabled = fals
             </g>
             <path
               ref={closedRef}
+              className="eye-closed"
               d={CLOSED_EYE_PATH}
               transform={CLOSED_EYE_TRANSFORM}
               fill="var(--fg)"
