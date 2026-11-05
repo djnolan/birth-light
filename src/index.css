@@ -61,95 +61,116 @@ input {
   pointer-events: none;
 }
 
-/* Pan-up transition: two screens rendered simultaneously */
-.pan-slide {
-  position: absolute;
-  inset: 0;
-}
-
-/* Foreground fades: the stars + figure are the spectacle */
-@keyframes panFadeOut {
-  0%   { opacity: 1; transform: translateY(0); }
-  100% { opacity: 0; transform: translateY(12px); }
-}
-
+/* Look-up sequence: message fades out, reveal fades in once the rays go */
 @keyframes panFadeIn {
   0%   { opacity: 0; transform: translateY(-10px); }
   100% { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes starMapReveal {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+.reveal-wrap {
+  height: 100%;
 }
 
-.pan-slide--out {
-  animation: panFadeOut 0.65s ease-in forwards;
-  z-index: 1;
+.reveal-wrap--entering {
+  animation: panFadeIn 0.8s ease-out both;
 }
 
-/* Prevent screenScaleIn from re-firing when MessageScreen remounts inside pan-slide */
-.pan-slide--out .message-screen {
-  animation: none;
+/* ─────────────────────────────
+   ART FRAME (eye button + star rays)
+   A fixed frame with the mockups' proportions (2340 × 5064), anchored to
+   the bottom of the screen, so the art sits exactly where it was drawn.
+───────────────────────────── */
+:root {
+  --frame-h: min(100vh, calc(100vw * 5064 / 2340));
 }
 
-/* Reveal foreground waits for stars + figure to do their thing, then fades in */
-.pan-slide--in {
-  animation: panFadeIn 0.8s ease-out 1.9s both;
-  z-index: 2;
+@supports (height: 100dvh) {
+  :root { --frame-h: min(100dvh, calc(100vw * 5064 / 2340)); }
 }
 
-/* ── Persistent figure layer (fixed, always rendered) ── */
-.figure-layer {
+.art-frame {
   position: fixed;
-  bottom: 0;
   left: 50%;
-  width: 125vw;
-  height: calc(125vw * 0.5625); /* 16:9 landscape */
-  z-index: 1;
+  bottom: 0;
+  height: var(--frame-h);
+  aspect-ratio: 2340 / 5064;
+  transform: translateX(-50%);
+  z-index: 3;
   pointer-events: none;
-  overflow: hidden;
-  will-change: transform;
 }
 
-.figure-layer .stop-motion {
+.eye-svg,
+.rays-svg {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  object-position: center bottom;
+  overflow: visible;
   display: block;
-  filter: grayscale(0.55) sepia(0.3) hue-rotate(175deg) saturate(0.55) brightness(0.8);
 }
 
-/* Only animate after first render */
-.figure-layer--animated {
-  transition: transform 2s ease-in;
+.eye-hit {
+  position: absolute;
+  pointer-events: auto;
+  border-radius: 50%;
+  -webkit-tap-highlight-color: transparent;
 }
 
-/* Home: flat line visible at bottom */
-.figure-layer--home {
-  transform: translateX(-50%) translateY(0);
+.eye-hit:disabled {
+  pointer-events: none;
 }
 
-/* Message: figure visible at bottom, full landscape */
-.figure-layer--message {
-  transform: translateX(-50%) translateY(0);
+.eye-hit:focus-visible {
+  outline: 1.5px solid var(--fg);
+  outline-offset: 4px;
 }
 
-/* Offscreen: figure slides below viewport */
-.figure-layer--offscreen {
-  transform: translateX(-50%) translateY(115%);
+.eye-hover {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 0.35s ease;
+}
+
+.eye-svg--hover .eye-hover {
+  transform: scale(1.05);
+}
+
+/* Idle: glow layers drift slightly, each on its own rhythm */
+.eye-idle {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: eyeDriftA 6.4s ease-in-out infinite;
+}
+
+.eye-idle--2 { animation: eyeDriftB 5.1s ease-in-out -1.3s infinite; }
+.eye-idle--1 { animation: eyeDriftA 4.3s ease-in-out -2.2s infinite reverse; }
+
+@keyframes eyeDriftA {
+  0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+  33%      { transform: translate(14px, -10px) rotate(1.4deg) scale(1.025); }
+  66%      { transform: translate(-10px, 8px) rotate(-1deg) scale(0.99); }
+}
+
+@keyframes eyeDriftB {
+  0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+  50%      { transform: translate(-16px, -6px) rotate(-1.6deg) scale(1.03); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .eye-idle { animation: none; }
 }
 
 /* ─────────────────────────────
    HOME SCREEN
 ───────────────────────────── */
 .home-screen {
+  position: relative;
   height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 2.5rem 2rem;
+  /* bottom padding leaves room for the eye button */
+  padding: 2.5rem 2rem calc(var(--frame-h) * 0.38);
   text-align: center;
 }
 
@@ -166,7 +187,7 @@ input {
 
 .home-headline {
   font-family: 'Eczar', serif;
-  font-size: clamp(3.75rem, 16vw, 6.5rem);
+  font-size: clamp(3.25rem, min(16vw, 9vh), 6.5rem);
   font-weight: 400;
   line-height: 0.9;
   letter-spacing: 0;
@@ -186,11 +207,6 @@ input {
   align-items: center;
   gap: 0.625rem;
   width: 100%;
-}
-
-.home-form .star-btn {
-  margin-top: 2.25rem;
-  margin-bottom: 4.5rem;
 }
 
 .date-label {
@@ -437,51 +453,12 @@ input {
   border-top-color: var(--muted);
 }
 
-/* ── Star-shape button (home + message) ── */
-.star-btn {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  background: none;
-  border: none;
-  padding: 0;
-  color: var(--accent);
-  transition: transform 0.2s ease;
-}
-
-.star-btn:hover {
-  transform: scale(1.1);
-}
-
-.star-btn-shape {
-  display: block;
-  width: 58px;
-  height: 58px;
-  overflow: visible;
-}
-
-.star-btn-arrow {
-  position: absolute;
-  color: var(--bg);
-  pointer-events: none;
-}
-
-/* Lookup variant on message screen */
-.star-btn--lookup {
-  flex-shrink: 0;
-  margin-top: 2rem;
-  opacity: 0.85;
-}
-
-.star-btn--lookup:hover {
-  opacity: 1;
-  transform: scale(1.08);
-}
-
 .privacy-note {
-  flex-shrink: 0;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 1.25rem;
+  margin: 0 auto;
   font-size: 0.8125rem;
   font-weight: 300;
   color: var(--muted);
@@ -502,12 +479,22 @@ input {
   animation: screenScaleIn 0.45s ease-out both;
 }
 
+.message-screen--leaving {
+  animation: messageLeave 0.6s ease-in both;
+}
+
+@keyframes messageLeave {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(12px); }
+}
+
 .message-body {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1rem 2.5rem calc(105vw * 0.5625 + 2rem);
+  /* bottom padding leaves room for the eye button */
+  padding: 1rem 2.5rem calc(var(--frame-h) * 0.38);
   min-height: 0;
 }
 
