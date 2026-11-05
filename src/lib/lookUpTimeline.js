@@ -2,10 +2,10 @@
 //
 //   eye opens wide and looks up → star rays shine down → camera pans up
 //   to the stars → rays fade → reveal text and UI fade in
-export const EYE_UP_MS = 750;
-export const SHINE_AT = 500;
+export const SHINE_AT = 400;
 export const SHINE_MS = 800;
-export const PAN_AT = 1250;
+export const RAYS_HOLD_MS = 1300; // pause on the rays before the camera moves
+export const PAN_AT = SHINE_AT + SHINE_MS + RAYS_HOLD_MS;
 export const PAN_MS = 2800;
 export const RAYS_FADE_AT = PAN_AT + 2000;
 export const RAYS_FADE_MS = 700;

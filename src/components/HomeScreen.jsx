@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import flatpickr from 'flatpickr';
 
 // The submit button is the eye (see EyeButton in App); this reports the
-// chosen date upward and exposes the picker so the eye can open it.
-export default function HomeScreen({ onSubmit, onDateChange, pickerRef }) {
+// chosen date upward so the eye can enable itself.
+export default function HomeScreen({ onSubmit, onDateChange }) {
   const [dateValue, setDateValue] = useState('');
   const inputRef = useRef(null);
   const fpRef = useRef(null);
@@ -47,11 +47,7 @@ export default function HomeScreen({ onSubmit, onDateChange, pickerRef }) {
         onDateChange?.(`${yyyy}-${mm}-${dd}`);
       },
     });
-    if (pickerRef) pickerRef.current = fpRef.current;
-    return () => {
-      fpRef.current?.destroy();
-      if (pickerRef) pickerRef.current = null;
-    };
+    return () => fpRef.current?.destroy();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   function handleSubmit(e) {

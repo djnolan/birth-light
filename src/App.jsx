@@ -35,7 +35,6 @@ export default function App() {
   const [revealEntering, setRevealEntering] = useState(false);
 
   const [pendingDate, setPendingDate] = useState('');
-  const pickerRef = useRef(null);
   const frameRef = useRef(null);
 
   const timersRef = useRef([]);
@@ -85,7 +84,6 @@ export default function App() {
   function handleEyeClick() {
     if (screen === 'home') {
       if (pendingDate) handleBirthday(pendingDate);
-      else pickerRef.current?.open();
     } else if (screen === 'message' && lookUpAt == null) {
       handleLookUp();
     }
@@ -139,7 +137,6 @@ export default function App() {
           <HomeScreen
             onSubmit={handleBirthday}
             onDateChange={setPendingDate}
-            pickerRef={pickerRef}
           />
         )}
         {screen === 'message' && star && (
@@ -167,9 +164,10 @@ export default function App() {
           state={eyeState}
           position={eyePosition}
           panStartAt={panStartAt}
+          disabled={screen === 'home' && !pendingDate}
           frameRef={frameRef}
           onClick={handleEyeClick}
-          label={screen === 'home' ? (pendingDate ? 'Begin' : 'Choose your birthday') : 'Look up at the stars'}
+          label={screen === 'home' ? 'Begin' : 'Look up at the stars'}
         />
       </div>
     </div>
