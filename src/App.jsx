@@ -7,7 +7,6 @@ import RevealScreen from './components/RevealScreen';
 import CalendarScreen from './components/CalendarScreen';
 import StarMap from './components/StarMap';
 import EyeButton from './components/EyeButton';
-import StarRays from './components/StarRays';
 
 const SWAP_DELAY = 500;
 
@@ -157,9 +156,6 @@ export default function App() {
       </div>
 
       <div className="art-frame" ref={frameRef}>
-        {lookUpAt != null && star && (
-          <StarRays startedAt={lookUpAt} starMag={star.mag} frameRef={frameRef} />
-        )}
         <EyeButton
           state={eyeState}
           position={eyePosition}

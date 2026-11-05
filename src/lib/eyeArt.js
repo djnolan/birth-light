@@ -81,32 +81,3 @@ export function toPath(n, dx = 0, dy = 0) {
   }
   return d + 'Z';
 }
-
-// ── Star rays (button-3-rays) ──
-// Each ray is stored as [dx, u] pairs: dx = horizontal offset from the
-// centre line (artboard units), u = 0 at the apex (star) and 1 at the base.
-// Callers stretch u between wherever the star and eye currently are.
-const RAY_SRC = [
-  { o: 0.1,  p: [8410.93,14437.4, 8477.63,14437.4, 9405.7,15529.6, 7958.82,15528.1] },
-  { o: 0.1,  p: [8410.93,14437.4, 8477.63,14437.4, 9025.83,15439.9, 6999.92,15436] },
-  { o: 0.05, p: [8410.93,14437.4, 8477.63,14437.4, 9927.1,15488.5, 8427.2,15481.2] },
-  { o: 0.2,  p: [8410.93,14437.4, 8477.63,14437.4, 8389.62,15496.6, 7436.9,15493.9] },
-  { o: 0.2,  p: [8410.93,14437.4, 8477.63,14437.4, 9189.8,15464.2, 8312.69,15463.9] },
-  { o: 0.3,  p: [8410.93,14437.4, 8477.63,14437.4, 8487.13,15516.3, 7822.15,15512.6] },
-];
-const RAY_FORE_SRC = [8410.93,14437.4, 8477.63,14437.4, 8796.42,15505.9, 8092.14,15505.9];
-
-function normalizeRay(p) {
-  const out = [];
-  for (let i = 0; i < p.length; i += 2) {
-    out.push(0.141989 * p[i] - 28.9941 - ART_W / 2, (p[i + 1] - 14437.4) / (15505.9 - 14437.4));
-  }
-  return out;
-}
-
-export const RAYS_BG = RAY_SRC.map(r => ({ opacity: r.o, pts: normalizeRay(r.p) }));
-export const RAY_FORE = normalizeRay(RAY_FORE_SRC);
-
-// In the mockup (rays-start) the ray runs from above the screen to just over
-// the looking-up eye. These are the artboard y values for that moment.
-export const RAY_BASE_Y = 2532;
