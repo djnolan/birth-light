@@ -5,7 +5,8 @@ import {
 } from '../lib/eyeArt';
 import { panProgress } from '../lib/lookUpTimeline';
 
-// Stop-motion: each state change plays a few held frames, not a smooth tween.
+// Stop-motion: each state change and blink plays a few held frames, not a
+// smooth tween. (Idle drift stays smooth.)
 // steps = how far along each frame is (0 = start state, 1 = end state);
 // ms = how long each frame holds.
 const MORPH_FRAMES = {
@@ -15,7 +16,6 @@ const MORPH_FRAMES = {
 };
 // Blink frames: how closed the eye is on each frame, and how long it holds
 const BLINK_FRAMES = [[0.55, 60], [1, 90], [0.55, 60]];
-const PUPIL_FRAME_MS = 330; // idle pupil drift updates at ~3fps
 const SLIDE_TAU = 260;      // ms; smoothing for sliding on/off screen
 
 // Hit area around the eye, in artboard units
@@ -122,11 +122,10 @@ export default function EyeButton({ state, position, panStartAt, disabled = fals
         }
       }
 
-      // Pupil drifts slightly while the eye is open, held a few frames at a time
+      // Pupil drifts slightly (and smoothly) while the eye is open
       let pupilDx = 0;
       if (l.state === 'open' && !reduceMotion) {
-        const tq = Math.floor(now / PUPIL_FRAME_MS) * PUPIL_FRAME_MS;
-        pupilDx = 16 * Math.sin(tq / 2300) + 6 * Math.sin(tq / 1100 + 1.3);
+        pupilDx = 16 * Math.sin(now / 2300) + 6 * Math.sin(now / 1100 + 1.3);
       }
 
       // ── Position: ride the camera pan, or slide to rest ──

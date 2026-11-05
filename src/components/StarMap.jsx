@@ -83,9 +83,9 @@ function easeInOut(t) {
   return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 4) / 2;
 }
 
-// Ease-out cubic: fast entry, graceful settle (used for camera pan-up)
-function easeOut(t) {
-  return 1 - Math.pow(1 - t, 3);
+// Ease-in-out cubic: slow start, fast middle, slow settle (camera pan-up)
+function easePan(t) {
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 }
 
 export default function StarMap({ centerStar, isPanning = false, panDuration = 2800, panStartAt = null, extraClass = '' }) {
@@ -154,7 +154,7 @@ export default function StarMap({ centerStar, isPanning = false, panDuration = 2
       let panProgress = 1.0;
       if (p.startTime !== null) {
         const t = Math.min(1, (now - p.startTime) / p.dur);
-        panProgress = easeOut(t);
+        panProgress = easePan(t);
       }
 
       // ── Star-to-star navigation transition ──
