@@ -158,6 +158,15 @@ input {
 
 /* Home, before a birthday is picked: only the inner glow layer, at the
    outer layer's faint opacity, and a slate closed eye */
+.eye-svg {
+  transition: opacity 0.45s ease;
+}
+
+/* Off screen after the pan; fades back in when returning home */
+.eye-svg--away {
+  opacity: 0;
+}
+
 .eye-svg path {
   transition: opacity 0.3s ease, fill-opacity 0.3s ease, fill 0.3s ease;
 }
@@ -168,7 +177,7 @@ input {
 }
 
 .eye-svg--disabled .eye-idle--1 path {
-  fill-opacity: 0.06;
+  fill-opacity: 0.1;
 }
 
 .eye-svg--disabled .eye-closed {

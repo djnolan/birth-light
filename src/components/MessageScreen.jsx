@@ -2,10 +2,10 @@ import { useEffect, useRef } from 'react';
 import { getRevealText } from '../lib/birthLight';
 import { panProgress } from '../lib/lookUpTimeline';
 
-// When the camera pans up, the text drops away with the scene, a little
-// faster than the eye (which moves 1×), for some parallax between the
-// layers. The stars move 1–1.45× depending on brightness.
-const TEXT_PARALLAX = 1.15;
+// When the camera pans up, the text drops away with the scene at the same
+// speed as the eye (1×). The stars move 1–1.45× depending on brightness,
+// which gives the parallax.
+const TEXT_PARALLAX = 1;
 
 // The "look up" button is the eye (see EyeButton in App).
 export default function MessageScreen({ star, panStartAt = null }) {
