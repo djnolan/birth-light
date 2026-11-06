@@ -10,8 +10,7 @@ import { easeInOutCubic, panProgress } from '../lib/lookUpTimeline';
 // Horizon heights are fractions of the art frame (the eye's frame), from
 // the top, for each screen. 'out' = slid off the bottom (pan up / reveal).
 const BANDS = [
-  { home: 0.21, message: 0.1, panMult: 1.0 },
-  { home: 0.61, message: 0.61, panMult: 1.0 }, // just above the eye
+  { home: 0.1, message: 0.06, panMult: 1.0 }, // up above the title
 ];
 const TOP_OPACITY = 0.07; // slate at each band's horizon; fades to 0 at the bottom
 const CURVE = 0.035;  // how far the horizon dips at the screen edges (× frame height)
