@@ -7,7 +7,8 @@ import RevealScreen from './components/RevealScreen';
 import CalendarScreen from './components/CalendarScreen';
 import StarMap from './components/StarMap';
 import EyeButton from './components/EyeButton';
-import StarRays from './components/StarRays';
+// Star rays are switched off for now; see lookUpTimeline.js to bring them back.
+// import StarRays from './components/StarRays';
 
 const SWAP_DELAY = 500;
 
@@ -157,9 +158,10 @@ export default function App() {
       </div>
 
       <div className="art-frame" ref={frameRef}>
+        {/* Star rays, switched off for now:
         {lookUpAt != null && star && (
           <StarRays startedAt={lookUpAt} starMag={star.mag} frameRef={frameRef} />
-        )}
+        )} */}
         <EyeButton
           state={eyeState}
           position={eyePosition}
