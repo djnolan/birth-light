@@ -156,10 +156,11 @@ input {
   50%      { transform: translate(-16px, -6px) rotate(-1.6deg) scale(1.03); }
 }
 
-/* Home, before a birthday is picked: only the inner glow layer, at the
-   outer layer's faint opacity, and a slate closed eye */
+/* Home, before a birthday is picked: only the middle glow layer, faint,
+   and a slate closed eye */
 .eye-svg {
-  transition: opacity 0.45s ease;
+  /* short delay so the eye has settled into its home look before it shows */
+  transition: opacity 0.45s ease 0.15s;
 }
 
 /* Off screen after the pan; fades back in when returning home */
@@ -171,12 +172,12 @@ input {
   transition: opacity 0.3s ease, fill-opacity 0.3s ease, fill 0.3s ease;
 }
 
-.eye-svg--disabled .eye-idle--2 path,
+.eye-svg--disabled .eye-idle--1 path,
 .eye-svg--disabled .eye-idle--3 path {
   opacity: 0;
 }
 
-.eye-svg--disabled .eye-idle--1 path {
+.eye-svg--disabled .eye-idle--2 path {
   fill-opacity: 0.1;
 }
 

@@ -68,7 +68,12 @@ export default function EyeButton({ state, position, panStartAt, disabled = fals
     const l = live.current;
     if (l.state === state) return;
     const now = performance.now();
-    l.morph = { from: l.shape, to: state, start: now };
+    // Off screen (e.g. heading back home): switch instantly, so the eye
+    // doesn't visibly snap shut as it fades back in
+    l.morph = l.position === 'out' && l.panStartAt == null
+      ? null
+      : { from: l.shape, to: state, start: now };
+    if (!l.morph) l.shape = EYE_STATES[state];
     l.blink = null;
     l.nextBlinkAt = now + randomBlinkDelay();
     l.state = state;
