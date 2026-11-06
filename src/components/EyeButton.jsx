@@ -18,8 +18,12 @@ const MORPH_FRAMES = {
 const BLINK_FRAMES = [[0.55, 60], [1, 90], [0.55, 60]];
 const SLIDE_TAU = 260;      // ms; smoothing for sliding on/off screen
 
+// The eye sits this far below where the mockups drew it (artboard units),
+// leaving room for the background band's horizon above it.
+const EYE_DROP = 150;
+
 // Hit area around the eye, in artboard units
-const HIT = { x: 800, y: 3220, w: 740, h: 760 };
+const HIT = { x: 800, y: 3220 + EYE_DROP, w: 740, h: 760 };
 
 function randomBlinkDelay() {
   return 2600 + Math.random() * 3800;
@@ -143,7 +147,7 @@ export default function EyeButton({ state, position, panStartAt, disabled = fals
       const offsetArt = l.offsetPx * ART_H / frameH;
 
       // ── Write to the DOM ──
-      moveRef.current?.setAttribute('transform', `translate(0 ${offsetArt.toFixed(1)})`);
+      moveRef.current?.setAttribute('transform', `translate(0 ${(offsetArt + EYE_DROP).toFixed(1)})`);
       bg3Ref.current?.setAttribute('d', toPath(drawn.bg3));
       bg2Ref.current?.setAttribute('d', toPath(drawn.bg2));
       bg1Ref.current?.setAttribute('d', toPath(drawn.bg1));
