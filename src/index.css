@@ -498,14 +498,6 @@ input {
   animation: screenScaleIn 0.45s ease-out both;
 }
 
-.message-screen--leaving {
-  animation: messageLeave 0.6s ease-in both;
-}
-
-@keyframes messageLeave {
-  from { opacity: 1; transform: translateY(0); }
-  to   { opacity: 0; transform: translateY(12px); }
-}
 
 .message-body {
   flex: 1;
