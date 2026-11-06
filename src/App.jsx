@@ -7,6 +7,7 @@ import RevealScreen from './components/RevealScreen';
 import CalendarScreen from './components/CalendarScreen';
 import StarMap from './components/StarMap';
 import EyeButton from './components/EyeButton';
+import BackgroundBands from './components/BackgroundBands';
 // Star rays are switched off for now; see lookUpTimeline.js to bring them back.
 // import StarRays from './components/StarRays';
 
@@ -132,6 +133,12 @@ export default function App() {
           panStartAt={panStartAt}
         />
       )}
+
+      <BackgroundBands
+        mode={screen === 'home' ? 'home' : screen === 'message' ? 'message' : 'out'}
+        panStartAt={panStartAt}
+        frameRef={frameRef}
+      />
 
       <div className={`screen-content${contentOut ? ' content-out' : ''}`}>
         {screen === 'home' && (

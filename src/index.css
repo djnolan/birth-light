@@ -75,6 +75,17 @@ input {
   animation: panFadeIn 0.8s ease-out both;
 }
 
+/* Faint background bands for depth (see BackgroundBands.jsx) */
+.bg-bands {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+  overflow: visible;
+}
+
 /* ─────────────────────────────
    ART FRAME (eye button + star rays)
    A fixed frame with the mockups' proportions (2340 × 5064), anchored to
