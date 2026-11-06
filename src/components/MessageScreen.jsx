@@ -2,10 +2,11 @@ import { useEffect, useRef } from 'react';
 import { getRevealText } from '../lib/birthLight';
 import { panProgress } from '../lib/lookUpTimeline';
 
-// When the camera pans up, the text stays put and drops away with the
-// scene. It moves a bit faster than the eye (which moves 1×) and some of
-// the stars, so the layers don't all slide at the same speed.
-const TEXT_PARALLAX = 1.3;
+// When the camera pans up, the text drops away with the scene, but more
+// slowly than the eye (which moves 1×), so it feels like it's behind the
+// eye. It moves just far enough to clear the bottom of the screen by the
+// end of the pan.
+const MIN_TEXT_PARALLAX = 0.8;
 
 // The "look up" button is the eye (see EyeButton in App).
 export default function MessageScreen({ star, panStartAt = null }) {
@@ -15,8 +16,11 @@ export default function MessageScreen({ star, panStartAt = null }) {
   useEffect(() => {
     if (panStartAt == null) return;
     let id;
+    const h = window.innerHeight;
+    const top = bodyRef.current?.querySelector('.message-text')?.getBoundingClientRect().top ?? 0;
+    const travel = Math.max(MIN_TEXT_PARALLAX * h, h - top + 8);
     function frame(now) {
-      const offset = panProgress(now, panStartAt) * window.innerHeight * TEXT_PARALLAX;
+      const offset = panProgress(now, panStartAt) * travel;
       if (bodyRef.current) bodyRef.current.style.transform = `translateY(${offset.toFixed(1)}px)`;
       id = requestAnimationFrame(frame);
     }
