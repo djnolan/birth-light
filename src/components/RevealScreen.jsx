@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useState } from 'react';
 import { ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
 import { getStarDisplayName, formatDate, getVisibilityNote } from '../lib/birthLight';
 
@@ -35,10 +35,12 @@ export default function RevealScreen({ stars, currentIndex, onIndexChange, onBac
   const canGoPrev = currentIndex > 0;
   const canGoNext = currentIndex < stars.length - 1;
 
-  // On first mount (e.g. arriving from pan-up) don't animate text; only animate on navigation
-  const mountedRef = useRef(false);
-  const animKey = mountedRef.current ? star.id : 'initial';
-  if (!mountedRef.current) mountedRef.current = true;
+  // On first mount (e.g. arriving from pan-up) don't animate text; only animate
+  // once the star actually changes. (Tracking this in a ref flipped on any
+  // re-render, which made the text vanish and fade back in.)
+  const [nav, setNav] = useState({ id: star.id, navigated: false });
+  if (nav.id !== star.id) setNav({ id: star.id, navigated: true });
+  const animKey = nav.navigated ? star.id : 'initial';
 
   return (
     <div className="reveal-screen">

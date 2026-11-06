@@ -1,92 +1,106 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { getUpcomingStars } from './lib/birthLight';
+import { PAN_AT, PAN_MS, REVEAL_AT, LOOK_UP_END } from './lib/lookUpTimeline';
 import HomeScreen from './components/HomeScreen';
 import MessageScreen from './components/MessageScreen';
 import RevealScreen from './components/RevealScreen';
 import CalendarScreen from './components/CalendarScreen';
 import StarMap from './components/StarMap';
-import StopMotionFigure from './components/StopMotionFigure';
+import EyeButton from './components/EyeButton';
+// Star rays are switched off for now; see lookUpTimeline.js to bring them back.
+// import StarRays from './components/StarRays';
 
 const SWAP_DELAY = 500;
-const PAN_DURATION = 2800;
 
 export default function App() {
+  const hasSaved = () => !!localStorage.getItem('birthlight_birthday');
+
   const [stars, setStars] = useState(() => {
     const saved = localStorage.getItem('birthlight_birthday');
     return saved ? getUpcomingStars(saved) : [];
   });
   const [starIdx, setStarIdx] = useState(0);
+  const [screen, setScreen] = useState(() => (hasSaved() ? 'reveal' : 'home'));
 
-  const [screen, setScreen] = useState(() =>
-    localStorage.getItem('birthlight_birthday') ? 'reveal' : 'home'
-  );
+  // Eye: 'closed' (home) | 'open' (message) | 'up' (look-up sequence)
+  const [eyeState, setEyeState] = useState(() => (hasSaved() ? 'up' : 'closed'));
+  // 'in' (on screen) | 'out' (below the screen)
+  const [eyePosition, setEyePosition] = useState(() => (hasSaved() ? 'out' : 'in'));
 
-  // 'home' | 'message' | 'offscreen'
-  const [figureState, setFigureState] = useState(() =>
-    localStorage.getItem('birthlight_birthday') ? 'offscreen' : 'home'
-  );
-
-  // 'static' (flat line) | 'intro' (line→figure transition) | 'loop' (figure loop)
-  const [figurePhase, setFigurePhase] = useState(() =>
-    localStorage.getItem('birthlight_birthday') ? 'loop' : 'static'
-  );
-
-  const [showStarMap, setShowStarMap] = useState(() =>
-    !!localStorage.getItem('birthlight_birthday')
-  );
+  const [showStarMap, setShowStarMap] = useState(hasSaved);
   const [contentOut, setContentOut] = useState(false);
 
-  // isPanningUp: true while the message→reveal camera pan is active
+  // Look-up sequence (message → reveal): start time, or null when idle
+  const [lookUpAt, setLookUpAt] = useState(null);
   const [isPanningUp, setIsPanningUp] = useState(false);
+  const [revealEntering, setRevealEntering] = useState(false);
 
-  // Prevent figure transition animation on first paint
-  const [animated, setAnimated] = useState(false);
-  useEffect(() => { requestAnimationFrame(() => setAnimated(true)); }, []);
+  const [pendingDate, setPendingDate] = useState('');
+  const frameRef = useRef(null);
 
-  const timerRef = useRef(null);
-  function clearT() { if (timerRef.current) clearTimeout(timerRef.current); }
+  const timersRef = useRef([]);
+  function later(fn, ms) { timersRef.current.push(setTimeout(fn, ms)); }
+  function clearTimers() { timersRef.current.forEach(clearTimeout); timersRef.current = []; }
+  useEffect(() => clearTimers, []);
 
   function transition(nextScreen, onSwap) {
     setContentOut(true);
-    clearT();
-    timerRef.current = setTimeout(() => {
+    clearTimers();
+    later(() => {
       setScreen(nextScreen);
       onSwap?.();
-      setTimeout(() => setContentOut(false), 30);
+      later(() => setContentOut(false), 30);
     }, SWAP_DELAY);
   }
 
   function handleBirthday(bd) {
     localStorage.setItem('birthlight_birthday', bd);
-    const upcoming = getUpcomingStars(bd);
-    setStars(upcoming);
+    setStars(getUpcomingStars(bd));
     setStarIdx(0);
-    setFigurePhase('intro'); // kick off line→figure animation immediately
-    transition('message', () => {
-      setAnimated(false);
-      setFigureState('message');
-      requestAnimationFrame(() => requestAnimationFrame(() => setAnimated(true)));
-    });
+    setEyeState('open');
+    transition('message');
   }
 
   function handleLookUp() {
-    setShowStarMap(true);
-    setFigureState('offscreen'); // figure slides off as camera rises
-    setIsPanningUp(true);        // canvas enters pan mode; foregrounds fade
-    clearT();
-    timerRef.current = setTimeout(() => {
-      setIsPanningUp(false);
+    clearTimers();
+    const t0 = performance.now();
+    setLookUpAt(t0);
+    setEyeState('up');
+    later(() => {
+      setShowStarMap(true);
+      setIsPanningUp(true);
+    }, PAN_AT);
+    later(() => setIsPanningUp(false), PAN_AT + PAN_MS);
+    later(() => {
+      setRevealEntering(true);
       setScreen('reveal');
-    }, PAN_DURATION);
+    }, REVEAL_AT);
+    later(() => {
+      setLookUpAt(null);
+      setEyePosition('out');
+    }, LOOK_UP_END);
+    later(() => setRevealEntering(false), REVEAL_AT + 1200);
+  }
+
+  function handleEyeClick() {
+    if (screen === 'home') {
+      if (pendingDate) handleBirthday(pendingDate);
+    } else if (screen === 'message' && lookUpAt == null) {
+      handleLookUp();
+    }
   }
 
   function handleBack() {
     localStorage.removeItem('birthlight_birthday');
-    setFigurePhase('static'); // revert to flat line
-    setFigureState('home');
     transition('home', () => {
       setShowStarMap(false);
       setStars([]);
+      setPendingDate('');
+      setLookUpAt(null);
+      setIsPanningUp(false);
+      setRevealEntering(false);
+      setEyeState('closed');
+      setEyePosition('in');
     });
   }
 
@@ -96,69 +110,67 @@ export default function App() {
   }
 
   const star = stars[starIdx];
+  const panStartAt = lookUpAt != null ? lookUpAt + PAN_AT : null;
 
-  const figureClass = [
-    'figure-layer',
-    `figure-layer--${figureState}`,
-    animated ? 'figure-layer--animated' : '',
-  ].join(' ');
+  const revealScreen = star && (
+    <RevealScreen
+      stars={stars}
+      currentIndex={starIdx}
+      onIndexChange={setStarIdx}
+      onBack={handleBack}
+      onCalendar={() => setScreen('calendar')}
+    />
+  );
 
   return (
     <div className="app">
       {showStarMap && star && (
-        <StarMap centerStar={star} isPanning={isPanningUp} panDuration={PAN_DURATION} />
+        <StarMap
+          centerStar={star}
+          isPanning={isPanningUp}
+          panDuration={PAN_MS}
+          panStartAt={panStartAt}
+        />
       )}
 
-      <div className={figureClass} aria-hidden="true">
-        <StopMotionFigure phase={figurePhase} />
+      <div className={`screen-content${contentOut ? ' content-out' : ''}`}>
+        {screen === 'home' && (
+          <HomeScreen
+            onSubmit={handleBirthday}
+            onDateChange={setPendingDate}
+          />
+        )}
+        {screen === 'message' && star && (
+          <MessageScreen star={star} leaving={lookUpAt != null} />
+        )}
+        {screen === 'reveal' && (
+          <div className={`reveal-wrap${revealEntering ? ' reveal-wrap--entering' : ''}`}>
+            {revealScreen}
+          </div>
+        )}
+        {screen === 'calendar' && (
+          <CalendarScreen
+            stars={stars}
+            onClose={() => setScreen('reveal')}
+            onStarSelect={handleStarSelect}
+          />
+        )}
       </div>
 
-      <div className={`screen-content${contentOut ? ' content-out' : ''}`}>
-        {isPanningUp ? (
-          // Pan: both screens render simultaneously; foregrounds fade quietly,
-          // the real action is the figure sliding off and the stars entering from above
-          <>
-            <div className="pan-slide pan-slide--out">
-              {star && <MessageScreen star={star} onLookUp={() => {}} />}
-            </div>
-            <div className="pan-slide pan-slide--in">
-              {star && (
-                <RevealScreen
-                  stars={stars}
-                  currentIndex={starIdx}
-                  onIndexChange={setStarIdx}
-                  onBack={handleBack}
-                  onCalendar={() => setScreen('calendar')}
-                />
-              )}
-            </div>
-          </>
-        ) : (
-          <>
-            {screen === 'home' && (
-              <HomeScreen onSubmit={handleBirthday} />
-            )}
-            {screen === 'message' && star && (
-              <MessageScreen star={star} onLookUp={handleLookUp} />
-            )}
-            {screen === 'reveal' && star && (
-              <RevealScreen
-                stars={stars}
-                currentIndex={starIdx}
-                onIndexChange={setStarIdx}
-                onBack={handleBack}
-                onCalendar={() => setScreen('calendar')}
-              />
-            )}
-            {screen === 'calendar' && (
-              <CalendarScreen
-                stars={stars}
-                onClose={() => setScreen('reveal')}
-                onStarSelect={handleStarSelect}
-              />
-            )}
-          </>
-        )}
+      <div className="art-frame" ref={frameRef}>
+        {/* Star rays, switched off for now:
+        {lookUpAt != null && star && (
+          <StarRays startedAt={lookUpAt} starMag={star.mag} frameRef={frameRef} />
+        )} */}
+        <EyeButton
+          state={eyeState}
+          position={eyePosition}
+          panStartAt={panStartAt}
+          disabled={screen === 'home' && !pendingDate}
+          frameRef={frameRef}
+          onClick={handleEyeClick}
+          label={screen === 'home' ? 'Begin' : 'Look up at the stars'}
+        />
       </div>
     </div>
   );

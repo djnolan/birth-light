@@ -83,17 +83,17 @@ function easeInOut(t) {
   return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 4) / 2;
 }
 
-// Ease-out cubic: fast entry, graceful settle (used for camera pan-up)
-function easeOut(t) {
-  return 1 - Math.pow(1 - t, 3);
+// Ease-in-out cubic: slow start, fast middle, slow settle (camera pan-up)
+function easePan(t) {
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 }
 
-export default function StarMap({ centerStar, isPanning = false, panDuration = 2800, extraClass = '' }) {
+export default function StarMap({ centerStar, isPanning = false, panDuration = 2800, panStartAt = null, extraClass = '' }) {
   const canvasRef = useRef(null);
 
   // All animation state in refs so the RAF loop never needs to restart
   const centerStarRef = useRef(centerStar);
-  const panRef = useRef({ isPanning: false, startTime: null, dur: panDuration });
+  const panRef = useRef({ isPanning: false, startTime: null, startAt: panStartAt, dur: panDuration });
   const starTransRef = useRef({ from: null, to: null, startTime: null });
 
   // Detect centerStar changes → start star-to-star pan transition
@@ -117,7 +117,8 @@ export default function StarMap({ centerStar, isPanning = false, panDuration = 2
       p.isPanning = false;
     }
     p.dur = panDuration;
-  }, [isPanning, panDuration]);
+    p.startAt = panStartAt;
+  }, [isPanning, panDuration, panStartAt]);
 
   // RAF loop — empty deps: runs once on mount, reads all state from refs
   useEffect(() => {
@@ -148,11 +149,12 @@ export default function StarMap({ centerStar, isPanning = false, panDuration = 2
 
       // ── Camera pan-up progress (message → reveal transition) ──
       const p = panRef.current;
-      if (p.isPanning && p.startTime === null) p.startTime = now;
+      // Start from the shared timeline when given, so the eye and rays stay in sync
+      if (p.isPanning && p.startTime === null) p.startTime = p.startAt ?? now;
       let panProgress = 1.0;
       if (p.startTime !== null) {
         const t = Math.min(1, (now - p.startTime) / p.dur);
-        panProgress = easeOut(t);
+        panProgress = easePan(t);
       }
 
       // ── Star-to-star navigation transition ──
