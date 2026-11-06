@@ -1,18 +1,20 @@
 import { useEffect, useRef } from 'react';
 import { easeInOutCubic, panProgress } from '../lib/lookUpTimeline';
 
-// Faint slate-blue bands behind the content, for depth. Each band fills
-// everything below a gently curved horizon, so where they overlap toward
-// the bottom of the screen it gets a little lighter. Up at the stars there
-// are no bands, so the sky stays the plain background colour.
+// Faint bands behind the content, for depth, like layered hills. Each band
+// sits below a gently curved horizon and has the same gradient: a touch of
+// slate at its horizon, fading to the plain dark background by the time it
+// reaches the next band's horizon (or the bottom of the screen). Up at the
+// stars there are no bands, so the sky stays the background colour.
 //
 // Horizon heights are fractions of the art frame (the eye's frame), from
 // the top, for each screen. 'out' = slid off the bottom (pan up / reveal).
 const BANDS = [
-  { opacity: 0.035, home: 0.21, message: -0.04, panMult: 1.1 },
-  { opacity: 0.035, home: 0.34, message: 0.1, panMult: 1.0 },
-  { opacity: 0.045, home: 0.71, message: 0.68, panMult: 1.0 },
+  { home: 0.21, message: -0.04, panMult: 1.1 },
+  { home: 0.34, message: 0.1, panMult: 1.0 },
+  { home: 0.71, message: 0.68, panMult: 1.0 },
 ];
+const TOP_OPACITY = 0.07; // slate at each band's horizon; fades to 0 at the bottom
 const CURVE = 0.035;  // how far the horizon dips at the screen edges (× frame height)
 const MOVE_MS = 1100; // moving between home and message, or sliding back in
 
@@ -28,6 +30,7 @@ function horizonsFor(mode, hr) {
  */
 export default function BackgroundBands({ mode, panStartAt, frameRef }) {
   const pathRefs = useRef([]);
+  const gradRefs = useRef([]);
   const live = useRef({ mode, panStartAt, cur: null, tween: null });
 
   useEffect(() => {
@@ -71,15 +74,22 @@ export default function BackgroundBands({ mode, panStartAt, frameRef }) {
       }
       l.cur = ys;
 
+      const dip = CURVE * frameH;
+      const horizon = f => frameTop + f * frameH; // centre of the curve
       ys.forEach((f, i) => {
         const el = pathRefs.current[i];
         if (!el) return;
-        const y = frameTop + f * frameH;
-        const dip = CURVE * frameH;
+        const y = horizon(f);
         el.setAttribute(
           'd',
           `M${-0.1 * w},${y + dip} Q${w / 2},${y - dip} ${1.1 * w},${y + dip} V${h + 10} H${-0.1 * w}Z`
         );
+        // Fade from this band's crest down to the next band's crest
+        const g = gradRefs.current[i];
+        const top = y - dip / 2; // a quadratic's peak is halfway to its control point
+        const below = i + 1 < ys.length ? horizon(ys[i + 1]) - dip / 2 : h;
+        g?.setAttribute('y1', top.toFixed(1));
+        g?.setAttribute('y2', Math.max(top + 40, below).toFixed(1));
       });
 
       id = requestAnimationFrame(frame);
@@ -91,12 +101,25 @@ export default function BackgroundBands({ mode, panStartAt, frameRef }) {
 
   return (
     <svg className="bg-bands" aria-hidden="true">
-      {BANDS.map((b, i) => (
+      <defs>
+        {BANDS.map((_, i) => (
+          <linearGradient
+            key={i}
+            id={`bg-band-fade-${i}`}
+            ref={el => { gradRefs.current[i] = el; }}
+            gradientUnits="userSpaceOnUse"
+            x1="0" y1="0" x2="0" y2="1"
+          >
+            <stop offset="0" stopColor="var(--muted)" stopOpacity={TOP_OPACITY} />
+            <stop offset="1" stopColor="var(--muted)" stopOpacity="0" />
+          </linearGradient>
+        ))}
+      </defs>
+      {BANDS.map((_, i) => (
         <path
           key={i}
           ref={el => { pathRefs.current[i] = el; }}
-          fill="var(--muted)"
-          fillOpacity={b.opacity}
+          fill={`url(#bg-band-fade-${i})`}
         />
       ))}
     </svg>
