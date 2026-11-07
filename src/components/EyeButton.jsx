@@ -16,7 +16,6 @@ const MORPH_FRAMES = {
 };
 // Blink frames: how closed the eye is on each frame, and how long it holds
 const BLINK_FRAMES = [[0.55, 60], [1, 90], [0.55, 60]];
-const SLIDE_TAU = 260;      // ms; smoothing for sliding on/off screen
 
 // Hit area around the eye, in artboard units
 const HIT = { x: 800, y: 3220, w: 740, h: 760 };
@@ -61,7 +60,6 @@ export default function EyeButton({ state, position, panStartAt, disabled = fals
     blink: null,           // { start }
     nextBlinkAt: 0,
     offsetPx: position === 'out' ? window.innerHeight : 0,
-    lastNow: null,
     state, position, panStartAt,
   });
 
@@ -70,7 +68,12 @@ export default function EyeButton({ state, position, panStartAt, disabled = fals
     const l = live.current;
     if (l.state === state) return;
     const now = performance.now();
-    l.morph = { from: l.shape, to: state, start: now };
+    // Off screen (e.g. heading back home): switch instantly, so the eye
+    // doesn't visibly snap shut as it fades back in
+    l.morph = l.position === 'out' && l.panStartAt == null
+      ? null
+      : { from: l.shape, to: state, start: now };
+    if (!l.morph) l.shape = EYE_STATES[state];
     l.blink = null;
     l.nextBlinkAt = now + randomBlinkDelay();
     l.state = state;
@@ -87,8 +90,6 @@ export default function EyeButton({ state, position, panStartAt, disabled = fals
     let id;
 
     function frame(now) {
-      const dt = l.lastNow == null ? 16 : Math.min(64, now - l.lastNow);
-      l.lastNow = now;
 
       // ── Shape: stepped morph between states, plus blinking while open ──
       let shape = EYE_STATES[l.state];
@@ -134,9 +135,8 @@ export default function EyeButton({ state, position, panStartAt, disabled = fals
       if (l.panStartAt != null) {
         l.offsetPx = h * panProgress(now, l.panStartAt);
       } else {
-        const target = l.position === 'out' ? h : 0;
-        l.offsetPx += (target - l.offsetPx) * (1 - Math.exp(-dt / SLIDE_TAU));
-        if (Math.abs(target - l.offsetPx) < 0.5) l.offsetPx = target;
+        // No slide: coming back home, the eye just fades in where it rests
+        l.offsetPx = l.position === 'out' ? h : 0;
       }
 
       const frameH = frameRef.current?.getBoundingClientRect().height || h;
@@ -171,6 +171,7 @@ export default function EyeButton({ state, position, panStartAt, disabled = fals
     'eye-svg',
     hover && interactive ? 'eye-svg--hover' : '',
     disabled ? 'eye-svg--disabled' : '',
+    position === 'out' && panStartAt == null ? 'eye-svg--away' : '',
   ].filter(Boolean).join(' ');
 
   return (

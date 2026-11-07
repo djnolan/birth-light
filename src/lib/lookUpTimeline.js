@@ -1,7 +1,8 @@
 // Timing for the "look up" sequence (message → reveal), in ms from the tap.
 //
 //   eye opens wide and looks up → short beat → camera pans up to the
-//   stars → reveal text and UI fade in
+//   stars, and the message text drops away with the scene → reveal
+//   text and UI fade in
 export const EYE_HOLD_MS = 850; // eye looks up (≈330ms of frames), then a beat
 export const PAN_AT = EYE_HOLD_MS;
 export const PAN_MS = 2800;

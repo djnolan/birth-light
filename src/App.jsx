@@ -141,7 +141,7 @@ export default function App() {
           />
         )}
         {screen === 'message' && star && (
-          <MessageScreen star={star} leaving={lookUpAt != null} />
+          <MessageScreen star={star} panStartAt={panStartAt} />
         )}
         {screen === 'reveal' && (
           <div className={`reveal-wrap${revealEntering ? ' reveal-wrap--entering' : ''}`}>
