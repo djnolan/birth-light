@@ -118,8 +118,13 @@ export default function EyeButton({ state, position, panStartAt, disabled = fals
           } else {
             const amt = BLINK_FRAMES[i][0];
             if (amt >= 1) closedAmount = 1;
-            // A blink moves the lids only; the glow layers stay put
-            else drawn = { ...blendStates(shape, EYE_STATES.closed, amt), bg1: shape.bg1, bg2: shape.bg2, bg3: shape.bg3 };
+            // A blink moves the lids only: the glow layers stay put, and the
+            // pupil stays solid (the lids clip it) instead of fading out
+            else drawn = {
+              ...blendStates(shape, EYE_STATES.closed, amt),
+              bg1: shape.bg1, bg2: shape.bg2, bg3: shape.bg3,
+              pupilOpacity: shape.pupilOpacity,
+            };
           }
         }
       }

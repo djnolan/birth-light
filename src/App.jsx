@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { getUpcomingStars } from './lib/birthLight';
-import { PAN_AT, PAN_MS, REVEAL_AT, LOOK_UP_END } from './lib/lookUpTimeline';
+import { PAN_AT, PAN_MS, REVEAL_AT, REVEAL_DONE_MS, LOOK_UP_END } from './lib/lookUpTimeline';
 import HomeScreen from './components/HomeScreen';
 import MessageScreen from './components/MessageScreen';
 import RevealScreen from './components/RevealScreen';
@@ -79,7 +79,7 @@ export default function App() {
       setLookUpAt(null);
       setEyePosition('out');
     }, LOOK_UP_END);
-    later(() => setRevealEntering(false), REVEAL_AT + 1200);
+    later(() => setRevealEntering(false), REVEAL_AT + REVEAL_DONE_MS);
   }
 
   function handleEyeClick() {
