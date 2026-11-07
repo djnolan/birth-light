@@ -58,8 +58,8 @@ export default function CalendarScreen({ stars, onClose, onStarSelect }) {
     <div className="calendar-screen">
       <div className="cal-header">
         <div>
-          <h2 className="cal-title">Upcoming dates</h2>
-          <p className="cal-subtitle">When your birth light will arrive</p>
+          <h2 className="cal-title">All of the light</h2>
+          <p className="cal-subtitle">Your birth light dates in the future</p>
         </div>
         <button onClick={onClose} className="close-btn" aria-label="Close calendar">
           <X size={22} />
