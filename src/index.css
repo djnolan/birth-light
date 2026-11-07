@@ -61,18 +61,31 @@ input {
   pointer-events: none;
 }
 
-/* Look-up sequence: message fades out, reveal fades in once the rays go */
+/* Look-up sequence: once the camera settles, the reveal text fades in and
+   drifts down, then the buttons fade in a beat later */
 @keyframes panFadeIn {
   0%   { opacity: 0; transform: translateY(-10px); }
   100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes uiFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 .reveal-wrap {
   height: 100%;
 }
 
-.reveal-wrap--entering {
-  animation: panFadeIn 0.8s ease-out both;
+.reveal-wrap--entering .reveal-top,
+.reveal-wrap--entering .reveal-bottom {
+  animation: panFadeIn 0.9s ease-out both;
+}
+
+/* Keep in step with REVEAL_DONE_MS in lookUpTimeline.js (delay + duration) */
+.reveal-wrap--entering .reveal-header,
+.reveal-wrap--entering .carousel-zone {
+  animation: uiFadeIn 0.8s ease-out 0.6s both;
 }
 
 /* ─────────────────────────────
@@ -82,6 +95,8 @@ input {
 ───────────────────────────── */
 :root {
   --frame-h: min(100vh, calc(100vw * 5064 / 2340));
+  /* Nudges the eye (and the home screen's text with it) a touch lower */
+  --eye-nudge: calc(var(--frame-h) * 0.025);
 }
 
 @supports (height: 100dvh) {
@@ -94,7 +109,7 @@ input {
   bottom: 0;
   height: var(--frame-h);
   aspect-ratio: 2340 / 5064;
-  transform: translateX(-50%);
+  transform: translate(-50%, var(--eye-nudge));
   z-index: 3;
   pointer-events: none;
 }
@@ -198,8 +213,9 @@ input {
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* bottom padding leaves room for the eye button */
-  padding: 2.5rem 2rem calc(var(--frame-h) * 0.38);
+  /* bottom padding leaves room for the eye button; the nudge moves the
+     whole group down with the eye */
+  padding: calc(2.5rem + var(--eye-nudge)) 2rem calc(var(--frame-h) * 0.38 - var(--eye-nudge));
   text-align: center;
 }
 
@@ -505,7 +521,8 @@ input {
   flex-direction: column;
   align-items: center;
   overflow: hidden;
-  animation: screenScaleIn 0.45s ease-out both;
+  /* slow, with a long gentle settle at the end */
+  animation: screenScaleIn 1.6s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 
@@ -522,10 +539,10 @@ input {
 .message-text {
   text-align: center;
   font-family: 'Eczar', serif;
-  font-size: clamp(1.0625rem, 3.6vw, 1.25rem);
+  font-size: clamp(1.3125rem, 4.6vw, 1.625rem);
   font-weight: 400;
-  line-height: 1.55;
-  max-width: 30ch;
+  line-height: 1.5;
+  max-width: 26ch;
   color: var(--fg);
 }
 
@@ -627,7 +644,7 @@ input {
 }
 
 @keyframes screenScaleIn {
-  from { opacity: 0; transform: scale(1.03); }
+  from { opacity: 0; transform: scale(1.05); }
   to   { opacity: 1; transform: scale(1); }
 }
 
