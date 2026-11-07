@@ -787,7 +787,7 @@ input {
   align-items: flex-start;
   justify-content: space-between;
   /* right padding leaves room for the close button */
-  padding: 2.5rem 4rem 0 1.5rem;
+  padding: 2rem 4rem 0 1.5rem;
 }
 
 /* Lines up with the calendar button on the reveal screen's header */
@@ -841,8 +841,10 @@ input {
   position: sticky;
   top: 0;
   z-index: 1;
-  padding-top: 1.25rem;
-  margin-bottom: 1.5rem;
+  /* spans the full page width, so dots at the ends of a line are covered
+     too as they scroll under */
+  margin: 0 -1.5rem 1.5rem;
+  padding: 1.75rem 1.5rem 0;
   background: var(--bg);
 }
 

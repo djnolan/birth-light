@@ -10,28 +10,32 @@ function DiamondDot({ hemisphere, rotDeg = 0, uid = 'x' }) {
   const rotT = `translate(${STAR_CX},${STAR_CY}) rotate(${rotDeg}) translate(${-STAR_CX},${-STAR_CY})`;
   const isHalf = hemisphere === 'northern' || hemisphere === 'southern';
 
+  // The whole diamond, half-fill cut included, is rotated together, so the
+  // cut always runs straight through the middle of the shape
   return (
     <svg viewBox="689 133 54 54" className="cal-dot-svg" aria-hidden="true">
       {isHalf && (
         <defs>
           <clipPath id={clipId}>
             {hemisphere === 'northern'
-              ? <rect x="689" y="133" width="54" height="26.82" />
-              : <rect x="689" y="159.82" width="54" height="27.18" />
+              ? <rect x="689" y="133" width="54" height={STAR_CY - 133} />
+              : <rect x="689" y={STAR_CY} width="54" height={187 - STAR_CY} />
             }
           </clipPath>
         </defs>
       )}
-      {isHalf ? (
-        <>
-          <path d={STAR_PATH_D} fill="none" stroke="currentColor" strokeWidth="2.5" transform={rotT} />
-          <g clipPath={`url(#${clipId})`}>
-            <path d={STAR_PATH_D} fill="currentColor" transform={rotT} />
-          </g>
-        </>
-      ) : (
-        <path d={STAR_PATH_D} fill="currentColor" transform={rotT} />
-      )}
+      <g transform={rotT}>
+        {isHalf ? (
+          <>
+            <path d={STAR_PATH_D} fill="none" stroke="currentColor" strokeWidth="2.5" />
+            <g clipPath={`url(#${clipId})`}>
+              <path d={STAR_PATH_D} fill="currentColor" />
+            </g>
+          </>
+        ) : (
+          <path d={STAR_PATH_D} fill="currentColor" />
+        )}
+      </g>
     </svg>
   );
 }
@@ -59,7 +63,7 @@ export default function CalendarScreen({ stars, onClose, onStarSelect }) {
       <div className="cal-header">
         <div>
           <h2 className="cal-title">All of the light</h2>
-          <p className="cal-subtitle">Your birth light dates in the future</p>
+          <p className="cal-subtitle">Your birth light days in the future</p>
         </div>
       </div>
 
