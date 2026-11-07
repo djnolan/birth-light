@@ -61,11 +61,22 @@ export default function CalendarScreen({ stars, onClose, onStarSelect }) {
           <h2 className="cal-title">All of the light</h2>
           <p className="cal-subtitle">Your birth light dates in the future</p>
         </div>
-        <button onClick={onClose} className="close-btn" aria-label="Close calendar">
-          <X size={22} />
-        </button>
       </div>
 
+      {/* Sits where the calendar button was on the previous screen, with the
+          same ghost outline as the back button */}
+      <button onClick={onClose} className="header-btn cal-close-btn" aria-label="Close calendar">
+        <span className="header-ghost-wrap">
+          <svg viewBox="689 133 54 54" className="header-ghost-svg" aria-hidden="true">
+            <path d={STAR_PATH_D} fill="none" stroke="currentColor" strokeWidth="2.5" />
+          </svg>
+          <X size={15} className="header-ghost-icon" />
+        </span>
+      </button>
+
+      <div className="cal-years">
+      {/* Sticky, so the years scroll up underneath it */}
+      <div className="cal-key-wrap">
       <div className="cal-key">
         <span className="cal-key-label">Visibility</span>
         <div className="cal-key-items">
@@ -83,8 +94,8 @@ export default function CalendarScreen({ stars, onClose, onStarSelect }) {
           </span>
         </div>
       </div>
+      </div>
 
-      <div className="cal-years">
         {years.map(({ year, stars: yearStars }) => (
           <div key={year} className="cal-year-row">
             <button className="cal-year-label" onClick={() => handleDotClick(yearStars[0].id)}>{year}</button>
