@@ -79,7 +79,7 @@ export default function HomeScreen({ onSubmit, onDateChange }) {
           </div>
         </form>
       </div>
-      <p className="privacy-note">Saved to your device only.</p>
+      <p className="privacy-note">Saved to your device only</p>
     </div>
   );
 }

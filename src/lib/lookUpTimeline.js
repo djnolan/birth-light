@@ -1,12 +1,15 @@
 // Timing for the "look up" sequence (message → reveal), in ms from the tap.
 //
 //   eye opens wide and looks up → short beat → camera pans up to the
-//   stars, and the message text drops away with the scene → reveal
-//   text and UI fade in
+//   stars, and the message text drops away with the scene → a beat once
+//   the camera settles → reveal text fades in, then the buttons a beat later
 export const EYE_HOLD_MS = 850; // eye looks up (≈330ms of frames), then a beat
 export const PAN_AT = EYE_HOLD_MS;
 export const PAN_MS = 2800;
-export const REVEAL_AT = PAN_AT + 2600;
+export const REVEAL_AT = PAN_AT + PAN_MS + 350;
+// The reveal's buttons fade in this long after its text (see index.css,
+// .reveal-wrap--entering), and the whole entrance is done by REVEAL_DONE_MS
+export const REVEAL_DONE_MS = 1600;
 export const LOOK_UP_END = PAN_AT + PAN_MS;
 
 // ── Star rays: switched off for now, kept for later ──
